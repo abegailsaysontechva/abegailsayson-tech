@@ -18,6 +18,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({ onSubmittingSuccess, e
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSending, setIsSending] = useState(false);
   const [successReceipt, setSuccessReceipt] = useState<FormSubmission | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,35 +46,48 @@ export const ContactForm: React.FC<ContactFormProps> = ({ onSubmittingSuccess, e
     }
 
     setErrors({});
+    setSubmitError(null);
     setIsSending(true);
 
     const data: FormSubmission = {
-  name,
-  email,
-  subject,
-  message,
-  businessType
-};
-
-try {
-  await fetch("https://n8n.absfunnels.online/webhook/95047e99-5503-49b4-80ca-fbbb256a0c3c", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
       name,
       email,
       subject,
-      sector: businessType,
-      message
-    })
-  });
-} catch (err) {
-  console.error("Webhook error:", err);
-}
+      message,
+      businessType
+    };
 
-setSuccessReceipt(data);
-onSubmittingSuccess(data);
-setIsSending(false);
+    try {
+      const response = await fetch("https://n8n.absfunnels.online/webhook/95047e99-5503-49b4-80ca-fbbb256a0c3c", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          subject,
+          sector: businessType,
+          message
+        })
+      });
+
+      if (!response.ok) {
+        // The request reached the server but it reported failure
+        // (e.g. workflow paused, validation error, n8n returned 4xx/5xx)
+        throw new Error(`Webhook responded with status ${response.status}`);
+      }
+
+      // Only show the success state if the webhook genuinely succeeded
+      setSuccessReceipt(data);
+      onSubmittingSuccess(data);
+    } catch (err) {
+      // Covers network failures (CORS, DNS, offline) AND non-OK responses above
+      console.error("Webhook error:", err);
+      setSubmitError(
+        "Something went wrong sending your message. Please try again, or reach out directly via WhatsApp below."
+      );
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const resetForm = () => {
@@ -82,6 +96,7 @@ setIsSending(false);
     setSubject('');
     setMessage('');
     setSuccessReceipt(null);
+    setSubmitError(null);
   };
 
   // WhatsApp helper linkage (Philippines prefix defaults, customized)
@@ -139,6 +154,13 @@ setIsSending(false);
       ) : (
         /* Standard Form fields */
         <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-4">
+
+          {submitError && (
+            <div className="flex items-start space-x-2 bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold rounded-lg p-3">
+              <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <span>{submitError}</span>
+            </div>
+          )}
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Name */}
