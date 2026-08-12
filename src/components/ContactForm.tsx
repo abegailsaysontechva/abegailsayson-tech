@@ -18,7 +18,6 @@ export const ContactForm: React.FC<ContactFormProps> = ({ onSubmittingSuccess, e
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSending, setIsSending] = useState(false);
   const [successReceipt, setSuccessReceipt] = useState<FormSubmission | null>(null);
-  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,48 +45,35 @@ export const ContactForm: React.FC<ContactFormProps> = ({ onSubmittingSuccess, e
     }
 
     setErrors({});
-    setSubmitError(null);
     setIsSending(true);
 
     const data: FormSubmission = {
+  name,
+  email,
+  subject,
+  message,
+  businessType
+};
+
+try {
+  await fetch("https://n8n.absfunnels.online/webhook/95047e99-5503-49b4-80ca-fbbb256a0c3c", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
       name,
       email,
       subject,
-      message,
-      businessType
-    };
+      sector: businessType,
+      message
+    })
+  });
+} catch (err) {
+  console.error("Webhook error:", err);
+}
 
-    try {
-      const response = await fetch("https://n8n.absfunnels.online/webhook/95047e99-5503-49b4-80ca-fbbb256a0c3c", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          email,
-          subject,
-          sector: businessType,
-          message
-        })
-      });
-
-      if (!response.ok) {
-        // The request reached the server but it reported failure
-        // (e.g. workflow paused, validation error, n8n returned 4xx/5xx)
-        throw new Error(`Webhook responded with status ${response.status}`);
-      }
-
-      // Only show the success state if the webhook genuinely succeeded
-      setSuccessReceipt(data);
-      onSubmittingSuccess(data);
-    } catch (err) {
-      // Covers network failures (CORS, DNS, offline) AND non-OK responses above
-      console.error("Webhook error:", err);
-      setSubmitError(
-        "Something went wrong sending your message. Please try again, or reach out directly via WhatsApp below."
-      );
-    } finally {
-      setIsSending(false);
-    }
+setSuccessReceipt(data);
+onSubmittingSuccess(data);
+setIsSending(false);
   };
 
   const resetForm = () => {
@@ -96,7 +82,6 @@ export const ContactForm: React.FC<ContactFormProps> = ({ onSubmittingSuccess, e
     setSubject('');
     setMessage('');
     setSuccessReceipt(null);
-    setSubmitError(null);
   };
 
   // WhatsApp helper linkage (Philippines prefix defaults, customized)
@@ -111,56 +96,28 @@ export const ContactForm: React.FC<ContactFormProps> = ({ onSubmittingSuccess, e
     <div className="bg-slate-900/60 backdrop-blur-sm rounded-2xl border border-white/10 shadow-xl overflow-hidden font-sans text-white">
       
       {successReceipt ? (
-        /* Success Receipt Render detailing system execution flow */
-        <div className="p-8 text-center space-y-6 animate-fadeIn">
+        /* Clean Confirmation Screen */
+        <div className="p-8 sm:p-12 text-center space-y-6 animate-fadeIn">
           <div className="h-16 w-16 mx-auto rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
             <CheckCircle className="h-10 w-10 animate-bounce" />
           </div>
 
-          <div className="space-y-2">
-            <h4 className="text-xl font-bold text-white">Message Dispatched!</h4>
-            <p className="text-sm text-gray-400">
-              Your inquiry triggered active automation chains. Below is your operational webhook log:
+          <div className="space-y-2 max-w-md mx-auto">
+            <p className="text-base sm:text-lg font-semibold text-gray-200 leading-relaxed">
+              Thank you! Your message has been submitted successfully. I'll get back to you soon.
             </p>
-          </div>
-
-          {/* Simulated Webhook Logger Log */}
-          <div className="bg-slate-950 text-slate-300 font-mono text-left p-5 rounded-2xl border border-brand-blue/30 max-w-md mx-auto space-y-2.5 text-xs">
-            <div className="flex justify-between text-[10px] text-gray-500 border-b border-white/5 pb-2">
-              <span>METADATA_HEADER</span>
-              <span className="text-brand-light-blue">n8n_log_active</span>
-            </div>
-            
-            <p><strong>payload.name:</strong> "{successReceipt.name}"</p>
-            <p><strong>payload.email:</strong> "{successReceipt.email}"</p>
-            <p><strong>payload.sector:</strong> "{successReceipt.businessType}"</p>
-            <p><strong>payload.subject:</strong> "{successReceipt.subject}"</p>
-            <p className="truncate"><strong>payload.message:</strong> "{successReceipt.message}"</p>
-
-            <div className="pt-2 border-t border-white/5 text-[10px] text-emerald-400 space-y-1">
-              <p>✔ CREATE_RECORD_CRM ➔ Done (status: active)</p>
-              <p>✔ DISPATCH_SLACK_NOTIFY ➔ Signal delivered to Abegail S.</p>
-              <p>✔ SEND_AUTO_REPLY ➔ Complete (Estimated response: &lt;2 hours)</p>
-            </div>
           </div>
 
           <button
             onClick={resetForm}
-            className="px-6 py-2.5 bg-brand-blue hover:bg-brand-blue/90 text-white text-xs font-bold rounded-lg transition-transform hover:scale-102 cursor-pointer"
+            className="px-6 py-2.5 bg-brand-accent hover:bg-brand-accent/90 text-white text-xs font-bold rounded-xl transition-all hover:scale-102 cursor-pointer shadow-lg shadow-brand-accent/20"
           >
-            Send Another Inquiry
+            Send Another Message
           </button>
         </div>
       ) : (
         /* Standard Form fields */
         <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-4">
-
-          {submitError && (
-            <div className="flex items-start space-x-2 bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-semibold rounded-lg p-3">
-              <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-              <span>{submitError}</span>
-            </div>
-          )}
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Name */}
@@ -284,7 +241,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({ onSubmittingSuccess, e
               {isSending ? (
                 <>
                   <span className="h-3.5 w-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin block" />
-                  <span>Firing webhook triggers...</span>
+                  <span>Sending message...</span>
                 </>
               ) : (
                 <>

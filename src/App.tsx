@@ -6,7 +6,6 @@ import About from './components/About';
 import Portfolio from './components/Portfolio';
 import Process from './components/Process';
 import ToolsAndPlatforms from './components/ToolsAndPlatforms';
-import Testimonials from './components/Testimonials';
 import BookingScheduler from './components/BookingScheduler';
 import ContactForm from './components/ContactForm';
 import MouseFollower from './components/MouseFollower';
@@ -59,7 +58,7 @@ export default function App() {
   // Update navbar section based on scrolling position
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ['services', 'portfolio', 'process', 'testimonials', 'contact'];
+      const sections = ['services', 'portfolio', 'process', 'contact'];
       const scrollPos = window.scrollY + 200;
 
       for (const section of sections) {
@@ -99,7 +98,7 @@ export default function App() {
     setInquiries(updatedInquiries);
     localStorage.setItem('abegails_inquiries', JSON.stringify(updatedInquiries));
     
-    triggerToast(`📬 Inbound webhook logged successfully! Dispatch signal fired to admin.`);
+    triggerToast(`📬 Message submitted successfully!`);
   };
 
   const handleClearAllLocalData = () => {
@@ -223,9 +222,6 @@ export default function App() {
 
         {/* Core tools and platforms used in automation with movable parallax background */}
         <ToolsAndPlatforms />
-
-        {/* Client validation cards */}
-        <Testimonials />
 
         {/* Integrated Booking Scheduler and Form Action Hub */}
         <section id="contact" className="py-24 bg-transparent text-white relative">

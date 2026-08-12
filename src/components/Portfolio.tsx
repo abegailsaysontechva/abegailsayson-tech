@@ -25,14 +25,14 @@ export const Portfolio: React.FC = () => {
             <div className="inline-flex items-center space-x-2 bg-brand-blue/20 border border-brand-blue/40 rounded-full px-4 py-1.5 backdrop-blur-sm">
               <Zap className="h-4 w-4 text-brand-light-blue" />
               <span className="text-xs font-mono font-bold text-brand-light-blue uppercase tracking-widest">
-                Case Studies
+                Personal Workflows & Demos
               </span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              Production Workflows in Action
+              Automation Workflows in Action
             </h2>
             <p className="text-base text-gray-400">
-              Explore custom systems I built for businesses, showing real triggers, connected pipelines, and the operational value delivered.
+              Explore personal automation systems and proof-of-concept workflows designed by Abegail, showing real triggers, connected pipelines, and demonstrated time savings.
             </p>
           </div>
 

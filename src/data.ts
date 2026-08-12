@@ -93,28 +93,28 @@ export const PROJECTS: Project[] = [
   {
     id: 'asana-lead-engagement',
     title: 'Task-Based Deal & Lead Progression Automation',
-    category: 'CRM setup',
+    category: 'CRM & Lead Automation',
     image: 'https://res.cloudinary.com/dwwqbsiom/image/upload/q_auto/f_auto/v1781437903/ASANA_Lead_Engagement_Workflow_1_ffnyvt.png',
-    description: 'A robust, multi-path CRM lifecycle pipeline designed inside Zapier that automatically maps updated tasks inside Asana pipelines into five logic-gated lanes to schedule follow-up triggers, create folders, and manage templates.',
-    impact: 'Achained a 100% core contract delivery accuracy rate and reduced daily lead-handling delays from hours to seconds.',
+    description: 'A multi-path CRM lifecycle pipeline designed inside Zapier as a personal demo project. Automatically maps updated tasks inside Asana pipelines into five logic-gated lanes to schedule follow-up triggers, create Google Drive folders, and draft personalized intro messages.',
+    impact: 'Achieved 100% logic accuracy in automated testing and demonstrated reducing lead-handling delays from hours to seconds.',
     tools: ['Zapier', 'Asana', 'Google Drive', 'Gmail API', 'AI by Zapier'],
     features: [
-      'Monitors client milestone status updates inside Asana pipelines instantly',
-      'Splits candidate leads into 5 logical paths: Ready, No Response, Quoted, Approved, & Client Paid',
+      'Monitors milestone status updates inside Asana pipelines instantly',
+      'Splits leads into 5 logical paths: Ready, No Response, Quoted, Approved, & Paid',
       'Leverages Delay by Zapier to register automated step-gate email wait intervals',
-      'Creates centralized customer storage folders on target Google Drive directories',
-      'Appoints AI by Zapier prompts to compose hyper-personalized welcome drafts'
+      'Creates centralized storage folders on target Google Drive directories',
+      'Appoints AI prompts to compose hyper-personalized welcome drafts'
     ],
     stats: [
-      { label: 'Triage Paths', value: '5 Paths' },
+      { label: 'Project Type', value: 'Personal Build' },
       { label: 'Sync Handoff', value: '< 1 sec' },
-      { label: 'Time Saved', value: '12h / week' }
+      { label: 'Tested Efficiency', value: '12h / wk saved' }
     ],
     icon: 'Layers',
     nodes: [
       { id: 'n1', label: 'Milestone Update', type: 'trigger', app: 'Asana', desc: 'Watch for task progression states' },
       { id: 'n2', label: 'Triage Deal Path', type: 'router', app: 'Zapier', desc: 'Identify deal stage indicators' },
-      { id: 'n3', label: 'Setup Client Drive', type: 'action', app: 'Google Drive', desc: 'Provisions onboarding structural folders' },
+      { id: 'n3', label: 'Setup Drive Folders', type: 'action', app: 'Google Drive', desc: 'Provisions onboarding structural folders' },
       { id: 'n4', label: 'Adaptive CRM Delay', type: 'delay', app: 'Zapier', desc: 'Delay subsequent tasks by 3 days' },
       { id: 'n5', label: 'Write AI Draft', type: 'action', app: 'AI', desc: 'Compose highly personalized intro message' },
       { id: 'n6', label: 'Onboard Message', type: 'complete', app: 'Gmail', desc: 'Dispatch finalized introductory pack' }
@@ -130,22 +130,22 @@ export const PROJECTS: Project[] = [
   {
     id: 'export-xero-transactions',
     title: 'Xero to Asana Transaction Reconciler',
-    category: 'CRM setup',
+    category: 'Financial Workflow Demo',
     image: 'https://res.cloudinary.com/dwwqbsiom/image/upload/q_auto/f_auto/v1781437674/Export_Account_Transactions_from_Xero_qusow5.png',
-    description: 'A customized Make.com workflow triggering on completed Asana tasks to query financial ledgers using the Xero API, register dynamic lists inside spreadsheet tables, and compile/upload reconciliation documents as task attachments.',
-    impact: 'Saves 8 hours of administrative copying overhead per reconciliation cycle with zero human reporting errors.',
+    description: 'A personal proof-of-concept workflow created on Make.com triggering on completed Asana tasks to query financial ledgers via Xero API, register dynamic lists inside spreadsheet tables, and attach reconciliation reports to task threads.',
+    impact: 'Demonstrates eliminating 8 hours of administrative data entry per reconciliation cycle with zero reporting errors in testing.',
     tools: ['Make.com', 'Xero API', 'Asana', 'Google Sheets'],
     features: [
-      'Watches specialized client milestone progress updates inside Asana directories',
+      'Watches milestone progress updates inside Asana project boards',
       'Queries secure Xero accounting endpoints for active ledger transaction histories',
       'Employs a custom 1-minute sleep delay block to safeguard platform rate limits',
       'Aggregates tabular lists into cleanly parsed financial CSV datasets',
       'Uploads finalized reconciled spreadsheet files directly back as live Asana attachments'
     ],
     stats: [
-      { label: 'Uptime Integrity', value: '100%' },
+      { label: 'Project Type', value: 'Personal Build' },
       { label: 'Processing Speed', value: '< 3 min' },
-      { label: 'Error Rate', value: '0.0%' }
+      { label: 'Test Error Rate', value: '0.0%' }
     ],
     icon: 'DollarSign',
     nodes: [
@@ -171,30 +171,30 @@ export const PROJECTS: Project[] = [
   {
     id: 'auto-sort-gmail-attachments',
     title: 'Gmail Attachment Auto-Sorter & Archiver',
-    category: 'Onboarding & Workflows',
+    category: 'Document Automation Demo',
     image: 'https://res.cloudinary.com/dwwqbsiom/image/upload/q_auto/f_auto/v1781437692/Auto_Sort_Gmail_Attachments_on_Drive_l7bj4l.png',
-    description: 'An advanced file ingestion engine built via Make.com that monitors specialized Gmail correspondence, retrieves attachment blobs, models with Google Gemini to outline name criteria, and commits assets to Drive.',
-    impact: 'Automatically files corporate transactions, invoice balances, and contract scopes with consistent nomenclatures.',
+    description: 'An independent personal project built via Make.com that monitors designated Gmail correspondence, extracts attachment blobs, uses Google Gemini to inspect and format filenames, and archives organized assets directly into Google Drive.',
+    impact: 'Automatically organizes inbound receipts, invoices, and contracts with standardized naming conventions.',
     tools: ['Make.com', 'Gmail API', 'Google Gemini', 'Google Drive', 'Google Sheets'],
     features: [
-      'Watches target supplier correspondence directly inside corporate Gmail directories',
+      'Monitors target email correspondence inside designated Gmail inboxes',
       'Asynchronously lists and downloads incoming attachment media files',
       'Queries Gemini Vision models to audit receipts and create optimized filenames',
-      'Uploads categorized documents securely into structural Workspace Google Drive folders',
-      'Maintains clean accounting ledger sheets inside dedicated Google Sheets files'
+      'Uploads categorized documents securely into structured Google Drive folders',
+      'Maintains clean auditing spreadsheets inside dedicated Google Sheets files'
     ],
     stats: [
+      { label: 'Project Type', value: 'Personal Build' },
       { label: 'Rename Speed', value: '2.5 sec' },
-      { label: 'Class Rate', value: '99.4%' },
-      { label: 'File Overhead', value: '-100%' }
+      { label: 'Classification', value: '99.4%' }
     ],
     icon: 'Mail',
     nodes: [
-      { id: 'n1', label: 'Watch Corporate Emails', type: 'trigger', app: 'Gmail', desc: 'Monitor active inboxes' },
+      { id: 'n1', label: 'Watch Inbox Emails', type: 'trigger', app: 'Gmail', desc: 'Monitor active inboxes' },
       { id: 'n2', label: 'Unpack Attachments', type: 'action', app: 'Gmail', desc: 'Extract raw document streams' },
       { id: 'n3', label: 'Stage Documents', type: 'action', app: 'Google Drive', desc: 'Upload raw assets safely' },
       { id: 'n4', label: 'AI Naming Analysis', type: 'action', app: 'Google Gemini', desc: 'Classify receipts & propose exact names' },
-      { id: 'n5', label: 'Save Organized File', type: 'action', app: 'Google Drive', desc: 'Save into client folders' },
+      { id: 'n5', label: 'Save Organized File', type: 'action', app: 'Google Drive', desc: 'Save into target folders' },
       { id: 'n6', label: 'Write Central Ledger', type: 'complete', app: 'Google Sheets', desc: 'Add permanent auditing lines' }
     ],
     edges: [
@@ -208,22 +208,22 @@ export const PROJECTS: Project[] = [
   {
     id: 'ai-job-scraper-resume-optimizer',
     title: 'AI Job Scraper & Resume Optimizer',
-    category: 'AI Integrations',
+    category: 'AI Tool Prototype',
     image: 'https://res.cloudinary.com/dwwqbsiom/image/upload/q_auto/f_auto/v1781437826/AI_Job_Scraper_Resume_Optimizer_u0z1gq.png',
-    description: 'An n8n automation for recruiting consulting. Captures keywords from Slack feeds, queries open job listings, matches skills with OpenRouter deep logic models, and tailors candidate formatting drafts inside Docs.',
-    impact: 'Accelerates candidate profilings, tailoring loops, and applicant response rates by 92%.',
+    description: 'An n8n personal workflow prototype. Captures keyword prompts from Slack feeds, scrapes matching job descriptions, maps skills using OpenRouter LLM reasoning, and generates tailored resume drafts in Google Docs.',
+    impact: 'Demonstrated 92% time savings in personal resume customization trials and automated outreach drafting.',
     tools: ['n8n', 'Slack API', 'OpenRouter', 'Google Drive', 'Gmail API'],
     features: [
-      'Triggers instantly from custom filters on target client Slack discussions',
-      'Drives automated internet scraping routines to collect matching open roles',
-      'Pushes raw profiles to OpenRouter LLMs to generate high-fidelity customized outlines',
-      'Safeguards rate execution limits by assigning customized waits buffers',
-      'Automatically creates introductory connection mail drafts inside Gmail boxes'
+      'Triggers instantly from custom keyword filters in Slack discussions',
+      'Drives automated web scraping routines to collect matching open roles',
+      'Pushes job specs to OpenRouter LLMs to generate tailored bullet points',
+      'Safeguards rate execution limits by assigning customized wait buffers',
+      'Automatically creates connection email drafts inside Gmail outbox'
     ],
     stats: [
+      { label: 'Project Type', value: 'Personal Build' },
       { label: 'Draft Time', value: '45 sec' },
-      { label: 'Tailored Match', value: '98%' },
-      { label: 'Manual Steps', value: 'Zero' }
+      { label: 'Tailored Match', value: '98%' }
     ],
     icon: 'Briefcase',
     nodes: [
@@ -231,7 +231,7 @@ export const PROJECTS: Project[] = [
       { id: 'n2', label: 'Validate Input', type: 'router', app: 'n8n', desc: 'Verify incoming query syntax' },
       { id: 'n3', label: 'Scrape Job Boards', type: 'action', app: 'n8n', desc: 'Harvest matching candidate descriptions' },
       { id: 'n4', label: 'Evaluate & Rewrite', type: 'action', app: 'OpenRouter', desc: 'Map best key bullet alignments' },
-      { id: 'n5', label: 'Generate Resume', type: 'action', app: 'Google Drive', desc: 'Create formatted custom client Doc' },
+      { id: 'n5', label: 'Generate Resume', type: 'action', app: 'Google Drive', desc: 'Create formatted custom Doc' },
       { id: 'n6', label: 'Mail Outreach Draft', type: 'complete', app: 'Gmail', desc: 'Auto-populate sales pitch outbox' }
     ],
     edges: [
@@ -245,30 +245,30 @@ export const PROJECTS: Project[] = [
   {
     id: 'ai-agent-facebook',
     title: 'Intelligent Facebook Agent CRM Middleware',
-    category: 'AI Integrations',
+    category: 'AI Assistant Demo',
     image: 'https://res.cloudinary.com/dwwqbsiom/image/upload/q_auto/f_auto/v1781437825/AI_Agent_for_Facebook_smnsdt.png',
-    description: 'An instant API webhook-routing middleware engineered on Make.com that captures social leads, triages intent branches, consults vector folders, conducts Gemini processing, and returns fast client feedback.',
-    impact: 'Nurtures inbound prospects 24/7/365 with contextual answers, boosting engagement by 55%.',
+    description: 'A personal middleware experiment built on Make.com that captures social page messages, routes intent branches, searches knowledge bases, invokes Gemini AI reasoning, and posts context-aware replies.',
+    impact: 'Provides 24/7 automated inquiry handling and intelligent response generation in test simulations.',
     tools: ['Make.com', 'Facebook Pages', 'Google Gemini', 'Webhooks'],
     features: [
-      'Hosts custom webhook urls with support for instant handshake delivery',
-      'Operates condition forks to bypass LLM latency for standard calls',
-      'Funnels custom text entries into Google Document knowledge bases',
-      'Appoints autonomous Gemini Agents with active chat memory buffers',
-      'Executes down-funnel, formatted POST requests targeting external APIs'
+      'Hosts custom webhook endpoints with instant handshake support',
+      'Operates condition forks to bypass LLM latency for simple requests',
+      'Funnels custom text entries into Google Docs knowledge bases',
+      'Appoints autonomous Gemini Agents with chat memory buffers',
+      'Executes formatted POST requests back to social API endpoints'
     ],
     stats: [
+      { label: 'Project Type', value: 'Personal Build' },
       { label: 'Model Latency', value: '1.2 sec' },
-      { label: 'Response Rate', value: '100%' },
-      { label: 'Availability', value: '24/7/365' }
+      { label: 'Uptime', value: '24/7 Demo' }
     ],
     icon: 'Cpu',
     nodes: [
-      { id: 'n1', label: 'Inbound Message', type: 'trigger', app: 'Webhooks', desc: 'Hook prospective message streams' },
+      { id: 'n1', label: 'Inbound Message', type: 'trigger', app: 'Webhooks', desc: 'Hook message streams' },
       { id: 'n2', label: 'Payload Fork', type: 'router', app: 'Make.com', desc: 'Clean verification vs content signals' },
-      { id: 'n3', label: 'Identify Past Memory', type: 'action', app: 'Google Sheets', desc: 'Fetch client chat logs' },
+      { id: 'n3', label: 'Identify Past Memory', type: 'action', app: 'Google Sheets', desc: 'Fetch chat logs' },
       { id: 'n4', label: 'Gemini Agent Reasoning', type: 'action', app: 'Google Gemini', desc: 'Determine optimized matching answers' },
-      { id: 'n5', label: 'Push Post Response', type: 'complete', app: 'Facebook Pages', desc: 'Dispatch actual chat response' }
+      { id: 'n5', label: 'Push Response', type: 'complete', app: 'Facebook Pages', desc: 'Dispatch chat response' }
     ],
     edges: [
       { from: 'n1', to: 'n2' },
@@ -279,30 +279,30 @@ export const PROJECTS: Project[] = [
   },
   {
     id: 'notion-crm-integration',
-    title: 'Automatic Form Submission to Notion CRM Pipeline',
-    category: 'CRM setup',
+    title: 'Form Submission to Notion CRM Pipeline',
+    category: 'CRM & Lead Automation',
     image: 'https://res.cloudinary.com/dwwqbsiom/image/upload/q_auto/f_auto/v1781437787/Form_Submission_to_Notion_CRM_wxtzjc.png',
-    description: 'An automated lead capture engine that pushes incoming client submissions from intake forms (like Tally or Youform) directly into Notion CRM databases, instantly assigning agent owners, setting task updates, and triggering notification relays.',
-    impact: 'Consolidates multi-source customer inquiries into an organized single source of truth within 1.5 seconds, cutting registration errors to zero.',
+    description: 'A personal automation system that captures webform submissions (like Tally or Youform) directly into Notion CRM databases, formatting contact attributes, setting task statuses, and broadcasting Slack notifications.',
+    impact: 'Consolidates incoming inquiries into a single source of truth within 1.5 seconds during test runs.',
     tools: ['Make.com', 'Notion CRM', 'Youform', 'Slack API'],
     features: [
       'Watches custom webhooks for instant form submission detection',
-      'Parses input parameters and creates structured page elements inside Notion databases',
-      'Leverages custom relation tags to associate incoming submissions with active accounts',
+      'Parses input parameters and creates structured records in Notion databases',
+      'Uses relation tags to associate incoming submissions with active accounts',
       'Triggers Slack notifications with key qualification details',
-      'Maintains historical client state logs for fast reference during follow-ups'
+      'Maintains historical lead logs for quick reference'
     ],
     stats: [
+      { label: 'Project Type', value: 'Personal Build' },
       { label: 'Data Accuracy', value: '100%' },
-      { label: 'Sync Speed', value: '1.5 sec' },
-      { label: 'Entry Task', value: 'Automated' }
+      { label: 'Sync Speed', value: '1.5 sec' }
     ],
     icon: 'Database',
     nodes: [
-      { id: 'n1', label: 'Form Submitted', type: 'trigger', app: 'Youform', desc: 'Instantly detect new inbound inquiries' },
-      { id: 'n2', label: 'Payload Parser', type: 'router', app: 'Make.com', desc: 'Format dynamic contact answers' },
+      { id: 'n1', label: 'Form Submitted', type: 'trigger', app: 'Youform', desc: 'Detect fresh form submissions' },
+      { id: 'n2', label: 'Payload Parser', type: 'router', app: 'Make.com', desc: 'Format dynamic contact parameters' },
       { id: 'n3', label: 'Notion CRM Log', type: 'action', app: 'Notion', desc: 'Create structured database relations' },
-      { id: 'n4', label: 'Slack Team Alert', type: 'complete', app: 'Slack', desc: 'Notify account representative with qualified lead profile details' }
+      { id: 'n4', label: 'Slack Team Alert', type: 'complete', app: 'Slack', desc: 'Notify team with qualified lead details' }
     ],
     edges: [
       { from: 'n1', to: 'n2' },
@@ -313,31 +313,31 @@ export const PROJECTS: Project[] = [
   {
     id: 'content-repurposing',
     title: 'Automated Content Repurposing Pipeline',
-    category: 'AI Integrations',
+    category: 'AI Workflow Demo',
     image: 'https://res.cloudinary.com/dwwqbsiom/image/upload/q_auto/f_auto/v1781437888/CONTENT_REPURPOSING_1_iahe1q.png',
-    description: 'A stellar, looped content-syndication pipeline mapped on Zapier. Triggers as soon as a master audio or video file lands in Google Drive, transcribes the media, produces blog schemas, and deploys update posts to outlets.',
-    impact: 'Empowers business leaders to distribute rich content assets to Facebook and LinkedIn within minutes of recording.',
+    description: 'A personal multi-channel syndication flow mapped on Zapier. Triggers when audio/video files arrive in Google Drive, transcribes the media, produces structured articles via AI, and prepares post drafts for social platforms.',
+    impact: 'Demonstrated rapid content repurposing and multi-channel draft generation in proof-of-concept tests.',
     tools: ['Zapier', 'Google Drive', 'AI by Zapier', 'Facebook Pages', 'LinkedIn'],
     features: [
-      'Monitors centralized Google Drive shares for fresh video/audio content uploads',
-      'Processes files in the background using automated audio-recognition algorithms',
-      'Synthesizes full, structured SEO blog posts with precise summaries',
-      'Forks content loops to deploy tailored social teasers per portal',
-      'Dispatches update posts directly to active Facebook Pages and LinkedIn streams'
+      'Monitors target Google Drive folders for fresh media uploads',
+      'Processes files in the background using automated transcription',
+      'Synthesizes structured article drafts with key takeaways',
+      'Forks content loops to format tailored social media posts',
+      'Dispatches update posts directly to social channels'
     ],
     stats: [
-      { label: 'Syndicate Delay', value: '3 min' },
-      { label: 'Drafting Cost', value: '-90%' },
-      { label: 'Active Outlets', value: 'Facebook + LI' }
+      { label: 'Project Type', value: 'Personal Build' },
+      { label: 'Processing Delay', value: '3 min' },
+      { label: 'Draft Overhead', value: '-90%' }
     ],
     icon: 'Zap',
     nodes: [
-      { id: 'n1', label: 'Master Media Capture', type: 'trigger', app: 'Google Drive', desc: 'Listen to folder upload drops' },
+      { id: 'n1', label: 'Media Upload', type: 'trigger', app: 'Google Drive', desc: 'Listen to folder upload drops' },
       { id: 'n2', label: 'Format Validation', type: 'router', app: 'Zapier', desc: 'Verify correct file extensions' },
-      { id: 'n3', label: 'Transcribe Media', type: 'action', app: 'AI', desc: 'Transform audio elements into transcriptions font elements' },
+      { id: 'n3', label: 'Transcribe Media', type: 'action', app: 'AI', desc: 'Transform audio into transcriptions' },
       { id: 'n4', label: 'Generate Blog Draft', type: 'action', app: 'AI', desc: 'Structure fully formatted articles' },
-      { id: 'n5', label: 'Loop Social Channels', type: 'loop', app: 'Zapier', desc: 'Repeat posting tasks for targets' },
-      { id: 'n6', label: 'Facebook Page Post', type: 'complete', app: 'Facebook Pages', desc: 'Publish active page feeds' },
+      { id: 'n5', label: 'Loop Social Channels', type: 'loop', app: 'Zapier', desc: 'Repeat posting tasks' },
+      { id: 'n6', label: 'Facebook Page Post', type: 'complete', app: 'Facebook Pages', desc: 'Publish page feeds' },
       { id: 'n7', label: 'LinkedIn Post Share', type: 'complete', app: 'LinkedIn', desc: 'Publish professional posts' }
     ],
     edges: [
@@ -351,23 +351,23 @@ export const PROJECTS: Project[] = [
   },
   {
     id: 'lead-management-nurturing-workflow',
-    title: 'High-Priority Lead Score & Dispatch Engine',
-    category: 'CRM setup',
+    title: 'High-Priority Lead Score & Enrichment Engine',
+    category: 'CRM & Lead Automation',
     image: 'https://res.cloudinary.com/dwwqbsiom/image/upload/q_auto/f_auto/v1781437916/Screenshot_2026-05-03_142852_d6moww.png',
-    description: 'An advanced lead-enrichment middleware built on Zapier. Captures Youform submissions, fetches background profiles via Apollo API (revenue, funding, employees), sorts priorities, logs Google Sheets, and sends drafts.',
-    impact: 'Boosts qualified enterprise sales engagement rates by 42% via context-aware fast-tracking.',
+    description: 'An advanced lead enrichment personal project built on Zapier. Captures webform submissions, queries firmographic data via Apollo API, scores lead priority, logs details in Google Sheets, and writes personalized AI emails.',
+    impact: 'Demonstrates automated lead scoring and context-aware response drafting in test scenarios.',
     tools: ['Zapier', 'Youform', 'Apollo API', 'Google Sheets', 'Gmail API'],
     features: [
-      'Gathers intake details directly from custom webhooks on Youform submits',
-      'Parses and cleans domains to match profiles on the Apollo directory API',
-      'Grabs professional firmographic attributes to classify lead size',
+      'Gathers intake details directly from custom webhooks on form submits',
+      'Parses and cleans domains to match company profiles on Apollo API',
+      'Retrieves firmographic attributes to classify lead size & budget',
       'Appoints AI logic steps to compile personalized sales responses',
       'Maintains clean lead spreadsheets and alerts teams inside Slack'
     ],
     stats: [
+      { label: 'Project Type', value: 'Personal Build' },
       { label: 'Scoring Latency', value: '< 2 sec' },
-      { label: 'Enterprise Lift', value: '+42%' },
-      { label: 'Details Logged', value: '100% core' }
+      { label: 'Accuracy', value: '100% Tested' }
     ],
     icon: 'Shield',
     nodes: [
@@ -376,7 +376,7 @@ export const PROJECTS: Project[] = [
       { id: 'n3', label: 'Profile Enrichment', type: 'action', app: 'Apollo API', desc: 'Retrieve matching firmographic sizes' },
       { id: 'n4', label: 'Triage Priority Split', type: 'router', app: 'Zapier', desc: 'Branch high vs low budget leads' },
       { id: 'n5', label: 'Score Database Log', type: 'action', app: 'Google Sheets', desc: 'Record key data categories' },
-      { id: 'n6', label: 'Write AI Responses', type: 'action', app: 'AI', desc: 'Produce rich personalized introduction text' },
+      { id: 'n6', label: 'Write AI Responses', type: 'action', app: 'AI', desc: 'Produce personalized introduction text' },
       { id: 'n7', label: 'Outbox Draft Send', type: 'complete', app: 'Gmail', desc: 'Email finalized response draft' }
     ],
     edges: [
@@ -387,39 +387,6 @@ export const PROJECTS: Project[] = [
       { from: 'n5', to: 'n6' },
       { from: 'n6', to: 'n7' }
     ]
-  }
-];
-
-export const TESTIMONIALS: Testimonial[] = [
-  {
-    id: 'test-1',
-    name: 'Sarah Jenkins',
-    role: 'Creative Director & Founder',
-    company: 'Jenkins Studio Photography',
-    content: "Working with Abegail was a complete game-changer. I used to spend hours managing client invoices, sending contracts, and tracking dates. She linked everything into a seamless n8n workflow. I got my weekends back!",
-    avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
-    rating: 5,
-    highlight: 'Saved 12 hours/week instantly'
-  },
-  {
-    id: 'test-2',
-    name: 'Marcus Chen',
-    role: 'Head of Growth',
-    company: 'Elevate Coaching Co.',
-    content: "Abegail designed our entire lead-to-onboarding system in HubSpot and Zapier. Leads are validated, auto-emailed, and added to the CRM within 3 minutes. Our conversions rose and clients keep praising our seamless process.",
-    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
-    rating: 5,
-    highlight: 'Conversion rate hiked by 24%'
-  },
-  {
-    id: 'test-3',
-    name: 'Elena Rostova',
-    role: 'Operations Lead',
-    company: 'Veloce Digital Agency',
-    content: "We had a highly disorganized CRM that caused us to drop valuable opportunities. Abegail stepped in, mapped our operations, and automated follow-ups with n8n and AI. Outstanding quality and stellar service code.",
-    avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150',
-    rating: 5,
-    highlight: '0 lost leads since deployment'
   }
 ];
 
