@@ -1,256 +1,292 @@
 import React, { useState } from 'react';
-import { Mail, MessageSquare, Send, AlertCircle, CheckCircle, ArrowRight, NotebookTabs } from 'lucide-react';
+import { Send, AlertCircle, CheckCircle, MessageCircle } from 'lucide-react';
 import { FormSubmission } from '../types';
+
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwmoqouShq4v03gkXMhwh1U8Qtn37iBztD-htWSBF2tCnl-O8M4OOZbJBKFV7t0Gwbg/exec';
 
 interface ContactFormProps {
   onSubmittingSuccess: (inquiry: FormSubmission) => void;
   emailContact: string;
 }
 
-export const ContactForm: React.FC<ContactFormProps> = ({ onSubmittingSuccess, emailContact }) => {
+export const ContactForm: React.FC<ContactFormProps> = ({ onSubmittingSuccess }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [subject, setSubject] = useState('');
-  const [businessType, setBusinessType] = useState('Photographer');
-  const [message, setMessage] = useState('');
-  
+  const [websiteLink, setWebsiteLink] = useState('');
+  const [whatDoYouPhotograph, setWhatDoYouPhotograph] = useState('Weddings');
+  const [headache, setHeadache] = useState('');
+
   // States
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSending, setIsSending] = useState(false);
-  const [successReceipt, setSuccessReceipt] = useState<FormSubmission | null>(null);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const newErrors: Record<string, string> = { ...errors };
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
 
-    // Validations
-    if (!name.trim()) newErrors.name = 'Please provide your name';
-    if (!email.trim()) {
-      newErrors.email = 'Email address is required';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Please provide a valid email format';
-    }
-    if (!subject.trim()) newErrors.subject = 'Subject is required';
-    if (!message.trim()) newErrors.message = 'Please input a short brief of your project';
+  // 1. Validation
+  const newErrors: Record<string, string> = {};
 
-    // Clear active correct validations
-    if (name.trim()) delete newErrors.name;
-    if (email.trim() && /\S+@\S+\.\S+/.test(email)) delete newErrors.email;
-    if (subject.trim()) delete newErrors.subject;
-    if (message.trim()) delete newErrors.message;
+  if (!name.trim()) {
+    newErrors.name = 'Your name is required';
+  }
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
+  if (!email.trim()) {
+    newErrors.email = 'Email address is required';
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    newErrors.email = 'Please provide a valid email format';
+  }
 
-    setErrors({});
-    setIsSending(true);
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors);
+    return;
+  }
 
-    const data: FormSubmission = {
-  name,
-  email,
-  subject,
-  message,
-  businessType
-};
+  setErrors({});
+  setIsSending(true);
 
-try {
-  await fetch("https://n8n.absfunnels.online/webhook/95047e99-5503-49b4-80ca-fbbb256a0c3c", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      name,
-      email,
-      subject,
-      sector: businessType,
-      message
-    })
-  });
-} catch (err) {
-  console.error("Webhook error:", err);
-}
+  // 2. Build the message
+  const fullMessage = websiteLink.trim()
+    ? `${headache.trim() || 'No specific headache noted.'}\n\nInstagram / Website: ${websiteLink.trim()}`
+    : (headache.trim() || 'No specific headache noted.');
 
-setSuccessReceipt(data);
-onSubmittingSuccess(data);
-setIsSending(false);
+  // 3. Build the data object
+  const data: FormSubmission = {
+    name: name.trim(),
+    email: email.trim(),
+    subject: `Studio Audit Request: ${whatDoYouPhotograph}`,
+    message: fullMessage,
+    businessType: whatDoYouPhotograph,
   };
+
+  // 4. Send to Google Sheets + email notifications
+  try {
+    await fetch(WEB_APP_URL, {
+      method: 'POST',
+      mode: 'no-cors', // avoids CORS errors with Apps Script
+      body: new URLSearchParams({
+        name: name.trim(),
+        email: email.trim(),
+        link: websiteLink.trim(),
+        specialty: whatDoYouPhotograph,
+        message: fullMessage,
+      }),
+    });
+  } catch (err) {
+    console.error('Form submission failed', err);
+  }
+
+  // 5. Show success and reset the form
+  onSubmittingSuccess(data);
+  setIsSending(false);
+  setIsSubmitted(true);
+  setName('');
+  setEmail('');
+  setWebsiteLink('');
+  setHeadache('');
+};
 
   const resetForm = () => {
     setName('');
     setEmail('');
-    setSubject('');
-    setMessage('');
-    setSuccessReceipt(null);
+    setWebsiteLink('');
+    setWhatDoYouPhotograph('Weddings');
+    setHeadache('');
+    setErrors({});
+    setIsSubmitted(false);
   };
 
-  // WhatsApp helper linkage (Philippines prefix defaults, customized)
   const handleWhatsAppRedirect = () => {
     const formattedText = encodeURIComponent(
-      `Hi Abegail! I visited your portfolio and would love to chat about automating some workflows for my business.`
+      `Hi Abegail! I visited your website and would love to chat about booking funnels and automation for my photography studio.`
     );
     window.open(`https://wa.me/639777658320?text=${formattedText}`, '_blank');
   };
 
   return (
-    <div className="bg-slate-900/60 backdrop-blur-sm rounded-2xl border border-white/10 shadow-xl overflow-hidden font-sans text-white">
+    <div className="card-glass rounded-2xl shadow-xl p-6 sm:p-8 flex flex-col h-full text-white font-sans">
       
-      {successReceipt ? (
-        /* Clean Confirmation Screen */
-        <div className="p-8 sm:p-12 text-center space-y-6 animate-fadeIn">
-          <div className="h-16 w-16 mx-auto rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
-            <CheckCircle className="h-10 w-10 animate-bounce" />
+      {/* Card Header */}
+      <div className="space-y-2 mb-6">
+        <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+          Prefer to Message Me?
+        </h3>
+        <p className="text-sm text-gray-300 leading-relaxed font-sans">
+          Tell me a bit about your studio, and I&apos;ll reply within 24 hours.
+        </p>
+      </div>
+
+      {isSubmitted ? (
+        /* Confirmation Screen */
+        <div className="my-auto py-12 px-4 text-center space-y-6">
+          <div className="h-16 w-16 mx-auto rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center">
+            <CheckCircle className="h-9 w-9" />
           </div>
 
-          <div className="space-y-2 max-w-md mx-auto">
-            <p className="text-base sm:text-lg font-semibold text-gray-200 leading-relaxed">
-              Thank you! Your message has been submitted successfully. I'll get back to you soon.
+          <div className="space-y-3 max-w-md mx-auto">
+            <h4 className="text-xl font-bold text-white">Thank you!</h4>
+            <p className="text-sm sm:text-base text-gray-200 leading-relaxed font-sans">
+              Thank you! I&apos;ve got your message and will reply within 24 hours. Check your inbox, and your spam folder just in case.
             </p>
           </div>
 
           <button
+            type="button"
             onClick={resetForm}
-            className="px-6 py-2.5 bg-brand-accent hover:bg-brand-accent/90 text-white text-xs font-bold rounded-xl transition-all hover:scale-102 cursor-pointer shadow-lg shadow-brand-accent/20"
+            className="px-6 py-2.5 bg-brand-accent hover:bg-orange-500 text-white text-xs font-bold rounded-xl transition-all hover:-translate-y-0.5 cursor-pointer shadow-lg shadow-brand-accent/20"
           >
             Send Another Message
           </button>
         </div>
       ) : (
-        /* Standard Form fields */
-        <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-4">
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Name */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-gray-300 text-left block">Your Name</label>
+        /* Contact Form */
+        <form onSubmit={handleSubmit} className="flex flex-col flex-grow justify-between">
+          <div className="space-y-4 flex flex-col flex-grow">
+            
+            {/* Your name (required) */}
+            <div className="space-y-1.5 text-left">
+              <label className="text-xs font-bold text-gray-200 block">
+                Your name <span className="text-brand-accent">*</span>
+              </label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => {
                   setName(e.target.value);
-                  if (e.target.value.trim() && errors.name) setErrors({...errors, name: ''});
+                  if (e.target.value.trim() && errors.name) {
+                    setErrors((prev) => {
+                      const next = { ...prev };
+                      delete next.name;
+                      return next;
+                    });
+                  }
                 }}
                 placeholder="Jane Doe"
-                className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-xs text-white focus:ring-1 focus:ring-brand-accent focus:border-brand-accent bg-slate-950/80 outline-none"
+                className={`w-full px-4 py-2.5 rounded-lg border ${
+                  errors.name ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-brand-accent'
+                } text-sm text-white focus:ring-1 focus:ring-brand-accent bg-slate-950/80 outline-none transition-colors`}
               />
               {errors.name && (
-                <span className="text-red-500 text-[10px] flex items-center space-x-1 font-semibold">
-                  <AlertCircle className="h-3 w-3" />
+                <span className="text-red-400 text-xs flex items-center gap-1 font-medium mt-1">
+                  <AlertCircle className="h-3.5 w-3.5 shrink-0" />
                   <span>{errors.name}</span>
                 </span>
               )}
             </div>
 
-            {/* Email */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-gray-300 text-left block">Email Address</label>
+            {/* Email (required) */}
+            <div className="space-y-1.5 text-left">
+              <label className="text-xs font-bold text-gray-200 block">
+                Email <span className="text-brand-accent">*</span>
+              </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
-                  if (e.target.value.trim() && errors.email) setErrors({...errors, email: ''});
+                  if (e.target.value.trim() && errors.email) {
+                    setErrors((prev) => {
+                      const next = { ...prev };
+                      delete next.email;
+                      return next;
+                    });
+                  }
                 }}
-                placeholder="jane@company.com"
-                className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-xs text-white focus:ring-1 focus:ring-brand-accent focus:border-brand-accent bg-slate-950/80 outline-none"
+                placeholder="jane@studio.com"
+                className={`w-full px-4 py-2.5 rounded-lg border ${
+                  errors.email ? 'border-red-500 focus:border-red-500' : 'border-white/10 focus:border-brand-accent'
+                } text-sm text-white focus:ring-1 focus:ring-brand-accent bg-slate-950/80 outline-none transition-colors`}
               />
               {errors.email && (
-                <span className="text-red-500 text-[10px] flex items-center space-x-1 font-semibold">
-                  <AlertCircle className="h-3 w-3" />
+                <span className="text-red-400 text-xs flex items-center gap-1 font-medium mt-1">
+                  <AlertCircle className="h-3.5 w-3.5 shrink-0" />
                   <span>{errors.email}</span>
                 </span>
               )}
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Subject */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-gray-300 text-left block">Subject</label>
+            {/* Instagram or website link (optional) */}
+            <div className="space-y-1.5 text-left">
+              <label className="text-xs font-bold text-gray-200 block">
+                Instagram or website link <span className="text-gray-400 font-normal">(optional)</span>
+              </label>
               <input
                 type="text"
-                value={subject}
-                onChange={(e) => {
-                  setSubject(e.target.value);
-                  if (e.target.value.trim() && errors.subject) setErrors({...errors, subject: ''});
-                }}
-                placeholder="Automation Project Inquiry"
-                className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-xs text-white focus:ring-1 focus:ring-brand-accent focus:border-brand-accent bg-slate-950/80 outline-none"
+                value={websiteLink}
+                onChange={(e) => setWebsiteLink(e.target.value)}
+                placeholder="instagram.com/yourstudio or yourstudio.com"
+                className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-sm text-white focus:ring-1 focus:ring-brand-accent focus:border-brand-accent bg-slate-950/80 outline-none transition-colors"
               />
-              {errors.subject && (
-                <span className="text-red-500 text-[10px] flex items-center space-x-1 font-semibold">
-                  <AlertCircle className="h-3 w-3" />
-                  <span>{errors.subject}</span>
-                </span>
-              )}
             </div>
 
-            {/* Business Sector */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-gray-300 text-left block">Your Business Sector</label>
+            {/* Automation service needed & photography specialty */}
+            <div className="space-y-1.5 text-left">
+              <label className="text-xs font-bold text-gray-200 block">
+                Photography specialty &amp; automation needed
+              </label>
               <select
-                value={businessType}
-                onChange={(e) => setBusinessType(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-xs text-white focus:ring-1 focus:ring-brand-accent focus:border-brand-accent bg-slate-950 outline-none"
+                value={whatDoYouPhotograph}
+                onChange={(e) => setWhatDoYouPhotograph(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-sm text-white focus:ring-1 focus:ring-brand-accent focus:border-brand-accent bg-slate-950 outline-none cursor-pointer"
               >
-                <option value="Photographer" className="bg-slate-955 bg-[#121c2c] text-white">📸 Wedding / Portrait Photographer</option>
-                <option value="Coaching" className="bg-slate-955 bg-[#121c2c] text-white">🧠 Coaching & Mentoring</option>
-                <option value="Service Agency" className="bg-slate-955 bg-[#121c2c] text-white">💼 Service Business / Agency</option>
-                <option value="Other" className="bg-slate-955 bg-[#121c2c] text-white">🛠️ Other Small Business</option>
+                <option value="Weddings — Inquiry & Booking Funnel" className="bg-[#121c2c] text-white">Weddings — Inquiry &amp; Booking Funnel</option>
+                <option value="Portraits & Families — Client Onboarding & Reminders" className="bg-[#121c2c] text-white">Portraits &amp; Families — Client Onboarding &amp; Reminders</option>
+                <option value="Studio Work — Gallery Delivery & Reviews" className="bg-[#121c2c] text-white">Studio Work — Gallery Delivery &amp; Reviews</option>
+                <option value="Commercial & Editorial — CRM & Lead Management" className="bg-[#121c2c] text-white">Commercial &amp; Editorial — CRM &amp; Lead Management</option>
+                <option value="Events & Mini-Sessions — Automated Scheduler" className="bg-[#121c2c] text-white">Events &amp; Mini-Sessions — Automated Scheduler</option>
+                <option value="Other Custom Studio Automation" className="bg-[#121c2c] text-white">Other Custom Studio Automation</option>
               </select>
             </div>
+
+            {/* What's your biggest headache right now? textarea */}
+            <div className="space-y-1.5 text-left flex flex-col flex-grow">
+              <label className="text-xs font-bold text-gray-200 block">
+                Main workflow problem / biggest headache
+              </label>
+              <textarea
+                value={headache}
+                onChange={(e) => setHeadache(e.target.value)}
+                placeholder="e.g. Inquiries sit unanswered while I shoot, chasing deposits takes forever, I forget to ask for reviews..."
+                className="w-full flex-grow min-h-[140px] px-4 py-2.5 rounded-lg border border-white/10 text-sm text-white focus:ring-1 focus:ring-brand-accent focus:border-brand-accent bg-slate-950/80 outline-none transition-colors resize-none"
+              />
+            </div>
+
           </div>
 
-          {/* Message Brief */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-gray-300 text-left block">Describe Your Target Workflow / Bottleneck</label>
-            <textarea
-              rows={4}
-              value={message}
-              onChange={(e) => {
-                setMessage(e.target.value);
-                if (e.target.value.trim() && errors.message) setErrors({...errors, message: ''});
-              }}
-              placeholder="What repetitive tasks would you like to eliminate first? How does your current lead intake pipeline compile?"
-              className="w-full px-4 py-2.5 rounded-lg border border-white/10 text-xs text-white focus:ring-1 focus:ring-brand-accent focus:border-brand-accent bg-slate-950/80 outline-none"
-            />
-            {errors.message && (
-              <span className="text-red-500 text-[10px] flex items-center space-x-1 font-semibold">
-                <AlertCircle className="h-3 w-3" />
-                <span>{errors.message}</span>
-              </span>
-            )}
-          </div>
+          {/* Action Buttons & Note */}
+          <div className="pt-4 mt-4 border-t border-white/10 space-y-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <button
+                type="submit"
+                disabled={isSending}
+                className="flex-1 px-6 py-3 rounded-xl bg-brand-accent hover:bg-orange-500 text-white font-semibold text-sm transition-all shadow-md shadow-black/40 border border-white/20 hover:shadow-brand-accent/30 hover:-translate-y-0.5 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {isSending ? (
+                  <>
+                    <span className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin block" />
+                    <span>Sending...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-4 w-4" />
+                    <span>Request a Free Studio Audit</span>
+                  </>
+                )}
+              </button>
 
-          <div className="pt-4 border-t border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-            
-            {/* Quick Whatsapp trigger */}
-            <button
-              type="button"
-              onClick={handleWhatsAppRedirect}
-              className="px-4 py-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-bold border border-emerald-500/30 flex items-center justify-center space-x-2 transition-colors cursor-pointer"
-            >
-              <span>Or Direct Chat via WhatsApp</span>
-            </button>
+              <button
+                type="button"
+                onClick={handleWhatsAppRedirect}
+                className="px-5 py-3 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 font-semibold text-sm border border-emerald-500/40 hover:border-emerald-500/60 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <MessageCircle className="h-4 w-4 text-emerald-400" />
+                <span>Chat on WhatsApp</span>
+              </button>
+            </div>
 
-            <button
-              type="submit"
-              disabled={isSending}
-              className="px-6 py-3 rounded-lg bg-brand-accent hover:bg-brand-accent/90 text-white text-xs font-bold transition-transform hover:scale-102 flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
-            >
-              {isSending ? (
-                <>
-                  <span className="h-3.5 w-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin block" />
-                  <span>Sending message...</span>
-                </>
-              ) : (
-                <>
-                  <Send className="h-3.5 w-3.5" />
-                  <span>Get My Free Automation Audit</span>
-                </>
-              )}
-            </button>
-
+            <p className="text-xs text-gray-400 text-center sm:text-left pt-1 font-sans">
+              No spam, no pressure. I only use your details to reply about your audit.
+            </p>
           </div>
 
         </form>

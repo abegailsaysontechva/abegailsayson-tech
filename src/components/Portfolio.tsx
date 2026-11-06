@@ -1,391 +1,565 @@
 import React, { useState } from 'react';
-import { PROJECTS } from '../data';
-import { LucideIcon } from './LucideIcon';
-import { Eye, Check, X, ArrowUpRight, Award, Zap } from 'lucide-react';
+import { 
+  Workflow, 
+  ChevronDown, 
+  ChevronUp, 
+  Eye, 
+  X, 
+  ArrowRight, 
+  Sparkles,
+  Layers,
+  CheckCircle2,
+  AlertTriangle,
+  Lightbulb,
+  FileCode,
+  ShieldCheck
+} from 'lucide-react';
+import { CASE_STUDIES, CaseStudy, ADDITIONAL_WORKFLOWS, AdditionalWorkflow } from '../data/caseStudiesData';
 
-export const Portfolio: React.FC = () => {
-  const [selectedProject, setSelectedProject] = useState<string | null>(null);
-  const [filter, setFilter] = useState<string>('All');
+interface PortfolioProps {
+  onOpenCaseStudy?: (study: CaseStudy) => void;
+  onBookCallClick?: () => void;
+}
 
-  const categories = ['All', 'Onboarding & Workflows', 'CRM setup', 'AI Integrations'];
+export const Portfolio: React.FC<PortfolioProps> = ({ onOpenCaseStudy, onBookCallClick }) => {
+  const [expandedFlows, setExpandedFlows] = useState<Record<string, boolean>>({});
+  const [activeCaseStudy, setActiveCaseStudy] = useState<CaseStudy | null>(null);
+  const [activeBlueprintModal, setActiveBlueprintModal] = useState<AdditionalWorkflow | null>(null);
 
-  const filteredProjects = filter === 'All'
-    ? PROJECTS
-    : PROJECTS.filter(proj => proj.category.toLowerCase().includes(filter.split(' ')[0].toLowerCase()));
+  const toggleFlow = (id: string) => {
+    setExpandedFlows(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
 
-  const activeProjectData = PROJECTS.find(p => p.id === selectedProject);
+  const handleCaseStudyClick = (study: CaseStudy) => {
+    if (onOpenCaseStudy) {
+      onOpenCaseStudy(study);
+    } else {
+      setActiveCaseStudy(study);
+    }
+  };
+
+  const handleContactClick = () => {
+    if (onBookCallClick) {
+      onBookCallClick();
+    } else {
+      const contactSec = document.getElementById('contact');
+      if (contactSec) {
+        contactSec.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
 
   return (
-    <section id="portfolio" className="py-24 bg-transparent text-white border-b border-white/5 relative">
+    <section id="demos" className="py-24 bg-transparent text-white relative">
+      {/* Compatibility anchor for legacy URLs */}
+      <div id="portfolio" className="absolute -top-24 pointer-events-none" />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 font-sans">
         
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
-          <div className="space-y-4 max-w-2xl">
-            <div className="inline-flex items-center space-x-2 bg-brand-blue/20 border border-brand-blue/40 rounded-full px-4 py-1.5 backdrop-blur-sm">
-              <Zap className="h-4 w-4 text-brand-light-blue" />
-              <span className="text-xs font-mono font-bold text-brand-light-blue uppercase tracking-widest">
-                Personal Workflows & Demos
+        <div className="text-center space-y-4 mb-16 sm:mb-20">
+          <div className="inline-flex items-center space-x-2 bg-brand-accent/20 border border-brand-accent/30 rounded-full px-3.5 py-1">
+            <Sparkles className="h-3.5 w-3.5 text-brand-accent" />
+            <span className="text-xs font-mono font-bold text-brand-accent uppercase tracking-wider">
+              PORTFOLIO &amp; DEMO FUNNELS
+            </span>
+          </div>
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white font-sans max-w-4xl mx-auto leading-tight">
+            See How a Photography Studio Runs on Autopilot
+          </h2>
+          <p className="text-base sm:text-lg text-slate-300 max-w-3xl mx-auto leading-relaxed">
+            Sample studio workflows designed for a fictional photography studio. Each project shows the problem, automation pipeline, and client experience.
+          </p>
+        </div>
+
+        {/* Featured Row: 3 Large Cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
+          {CASE_STUDIES.map((study) => {
+            const isFlowExpanded = !!expandedFlows[study.id];
+
+            return (
+              <div 
+                key={study.id}
+                className="group relative rounded-3xl card-glass hover:border-brand-accent/40 p-6 sm:p-7 transition-all duration-300 flex flex-col justify-between shadow-xl"
+              >
+                <div className="space-y-6">
+                  {/* Top Bar: Status Tag & Category */}
+                  <div className="flex items-center justify-between">
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-mono font-bold bg-brand-accent/20 text-brand-accent border border-brand-accent/30 uppercase tracking-wider">
+                      {study.status}
+                    </span>
+                    <span className="text-xs font-mono text-cyan-400">
+                      Photography System
+                    </span>
+                  </div>
+
+                  {/* Title & Problem */}
+                  <div className="space-y-3">
+                    <h3 className="text-xl sm:text-2xl font-bold text-white group-hover:text-brand-accent transition-colors font-sans leading-snug">
+                      {study.title}
+                    </h3>
+                    
+                    <div className="rounded-xl bg-rose-950/30 border border-rose-500/20 p-3">
+                      <p className="text-xs text-rose-200/90 font-sans leading-relaxed">
+                        <span className="text-rose-400 font-bold uppercase font-mono text-[10px] tracking-wider block mb-0.5">
+                          Problem:
+                        </span>
+                        {study.problem}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Numbered Flow with 5 steps */}
+                  <div>
+                    <span className="text-[11px] font-mono font-bold text-slate-300 uppercase tracking-wider block mb-2.5">
+                      Automation Pipeline:
+                    </span>
+                    <ol className="space-y-2">
+                      {study.pipeline.map((step) => (
+                        <li key={step.stepNumber} className="flex items-start text-xs sm:text-sm text-slate-200 font-sans">
+                          <span className="h-5 w-5 rounded-full bg-brand-accent/20 border border-brand-accent/30 text-brand-accent text-[11px] font-mono font-bold flex items-center justify-center shrink-0 mr-2.5 mt-0.5">
+                            {step.stepNumber}
+                          </span>
+                          <span className="leading-snug pt-0.5">{step.title}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+
+                  {/* Client Experience */}
+                  <div className="rounded-xl bg-emerald-950/30 border border-emerald-500/20 p-3">
+                    <span className="text-emerald-400 font-bold uppercase font-mono text-[10px] tracking-wider block mb-0.5">
+                      Client Experience:
+                    </span>
+                    <p className="text-xs text-emerald-200/90 font-sans leading-relaxed">
+                      &ldquo;{study.clientExperience}&rdquo;
+                    </p>
+                  </div>
+
+                  {/* Tools row */}
+                  <div className="pt-2 border-t border-white/10">
+                    <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
+                      TOOLS USED
+                    </span>
+                    <div className="p-2.5 rounded-lg bg-black/40 border border-white/5 text-[11px] font-mono text-slate-300 leading-relaxed">
+                      {study.toolsUsed.join(' • ')}
+                    </div>
+                  </div>
+
+                  {/* Expandable System Architecture */}
+                  {isFlowExpanded && (
+                    <div className="rounded-2xl bg-slate-950/90 border border-brand-accent/30 p-4 space-y-3 animate-fadeIn">
+                      <span className="text-[10px] font-mono font-bold text-brand-accent uppercase tracking-wider block">
+                        System Architecture Breakdown
+                      </span>
+                      <div className="space-y-2">
+                        {study.architectureSteps.map((step, sIdx) => (
+                          <React.Fragment key={sIdx}>
+                            <div className="flex items-center space-x-2.5 p-2 rounded-lg bg-white/5 border border-white/5 text-xs text-slate-200 font-sans">
+                              <span className="text-[10px] font-mono font-bold text-brand-accent uppercase px-1.5 py-0.5 rounded bg-brand-accent/15 border border-brand-accent/30">
+                                {step.type}
+                              </span>
+                              <div className="flex-1 min-w-0">
+                                <span className="font-semibold block truncate">{step.label}</span>
+                                <span className="text-[11px] text-slate-400 block truncate">{step.sublabel}</span>
+                              </div>
+                            </div>
+                            {sIdx < study.architectureSteps.length - 1 && (
+                              <div className="flex justify-center py-0.5">
+                                <span className="text-brand-accent text-xs font-mono">↓</span>
+                              </div>
+                            )}
+                          </React.Fragment>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Card Action Buttons: View Case Study & See How It Works */}
+                <div className="mt-6 pt-5 border-t border-white/10 flex flex-col sm:flex-row gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => handleCaseStudyClick(study)}
+                    className="flex-1 inline-flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-brand-accent hover:bg-orange-500 text-white text-xs font-bold font-mono uppercase tracking-wider transition-all cursor-pointer shadow-md hover:shadow-brand-accent/25"
+                  >
+                    <span>View Case Study →</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => toggleFlow(study.id)}
+                    className="flex-1 inline-flex items-center justify-center space-x-1.5 py-3 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-accent/30 text-xs font-bold font-mono text-slate-200 uppercase tracking-wider transition-all cursor-pointer"
+                  >
+                    <Workflow className="h-3.5 w-3.5 text-cyan-400" />
+                    <span>{isFlowExpanded ? 'Hide Flow' : 'See How It Works'}</span>
+                    {isFlowExpanded ? (
+                      <ChevronUp className="h-3.5 w-3.5 ml-0.5" />
+                    ) : (
+                      <ChevronDown className="h-3.5 w-3.5 ml-0.5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Secondary Row: "More Automation Builds" */}
+        <div className="pt-8 border-t border-white/10">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+            <div>
+              <span className="text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest block mb-1">
+                ADDITIONAL SYSTEMS
               </span>
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-white font-sans tracking-tight">
+                More Automation Builds
+              </h3>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              Automation Workflows in Action
-            </h2>
-            <p className="text-base text-gray-400">
-              Explore personal automation systems and proof-of-concept workflows designed by Abegail, showing real triggers, connected pipelines, and demonstrated time savings.
+            <p className="text-xs sm:text-sm text-slate-300 max-w-md">
+              Production workflows connecting forms, AI reasoning middleware, and intelligent file handling.
             </p>
           </div>
 
-          {/* Filters */}
-          <div className="flex flex-wrap gap-2 shrink-0">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setFilter(cat)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
-                  filter === cat
-                    ? 'bg-brand-light-blue text-white shadow-md shadow-brand-light-blue/25'
-                    : 'bg-slate-900 border border-white/5 text-gray-400 hover:text-white hover:bg-slate-900/80'
-                }`}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {ADDITIONAL_WORKFLOWS.map((build) => (
+              <div 
+                key={build.id}
+                className="group rounded-2xl card-glass hover:border-brand-accent/40 p-5 transition-all duration-300 flex flex-col justify-between shadow-lg"
               >
-                {cat}
-              </button>
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-white/5 text-slate-300 border border-white/10 uppercase tracking-wider">
+                      {build.tag}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setActiveBlueprintModal(build)}
+                      className="text-xs font-mono text-cyan-400 hover:text-white flex items-center gap-1 transition-colors"
+                      title="Inspect Blueprint"
+                    >
+                      <Eye className="h-3.5 w-3.5" />
+                      <span>Blueprint</span>
+                    </button>
+                  </div>
+
+                  <div 
+                    onClick={() => setActiveBlueprintModal(build)}
+                    className="aspect-video w-full rounded-xl overflow-hidden bg-slate-900 border border-white/5 mb-4 relative cursor-pointer group-hover:border-cyan-400/30 transition-all"
+                  >
+                    <img 
+                      src={build.image} 
+                      alt={build.title}
+                      referrerPolicy="no-referrer"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                    />
+                    <div className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <span className="bg-brand-accent text-white px-3 py-1.5 rounded-lg text-xs font-mono font-bold flex items-center gap-1.5 shadow">
+                        <Eye className="h-3.5 w-3.5" /> View Workflow Blueprint
+                      </span>
+                    </div>
+                  </div>
+
+                  <h4 className="text-base font-bold text-white group-hover:text-cyan-400 transition-colors font-sans mb-2 leading-snug">
+                    {build.title}
+                  </h4>
+                  <p className="text-xs text-slate-300 leading-relaxed font-sans line-clamp-3 mb-4">
+                    {build.description}
+                  </p>
+                </div>
+
+                <div className="pt-4 border-t border-white/5">
+                  <div className="flex flex-wrap gap-1.5 mb-3">
+                    {build.tools.map((tool, tIdx) => (
+                      <span 
+                        key={tIdx}
+                        className="px-2 py-0.5 rounded text-[10px] font-mono text-slate-300 bg-white/5 border border-white/5"
+                      >
+                        {tool}
+                      </span>
+                    ))}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setActiveBlueprintModal(build)}
+                    className="w-full py-2 px-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-cyan-400/40 text-[11px] font-mono font-bold text-slate-200 uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                  >
+                    <Layers className="h-3.5 w-3.5 text-cyan-400" />
+                    <span>View Architecture Blueprint</span>
+                  </button>
+                </div>
+              </div>
             ))}
           </div>
         </div>
 
-        {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredProjects.map((proj) => (
-            <div
-              key={proj.id}
-              className="group bg-slate-950/60 rounded-2xl border border-white/5 hover:border-brand-blue/40 hover:bg-slate-950 transition-all duration-300 flex flex-col justify-between overflow-hidden relative shadow-lg"
-            >
-              {/* Dynamic Header Badge */}
-              <div className="absolute top-4 right-4 bg-slate-950/90 px-2.5 py-1 rounded text-[10px] font-mono text-brand-light-blue border border-white/10 uppercase tracking-wider z-20 shadow-md">
-                {proj.category}
+        {/* Callout below cards */}
+        <div className="mt-20 text-center max-w-2xl mx-auto p-8 sm:p-10 rounded-3xl bg-slate-900/40 border border-white/10 shadow-xl font-sans">
+          <h3 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">
+            Want a system like this for your studio?
+          </h3>
+          <p className="text-sm sm:text-base text-slate-300 leading-relaxed mb-6 max-w-lg mx-auto">
+            Let&apos;s design and connect your booking funnel, automated follow-ups, and client delivery steps so your business operates on autopilot.
+          </p>
+          <button
+            type="button"
+            onClick={handleContactClick}
+            className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 rounded-full bg-brand-accent hover:bg-orange-500 text-white font-bold cursor-pointer transition-all shadow-lg hover:shadow-brand-accent/25 text-sm uppercase font-mono tracking-wider"
+          >
+            Get a Free Studio Funnel Audit
+          </button>
+        </div>
+
+      </div>
+
+      {/* Comprehensive Case Study Modal */}
+      {activeCaseStudy && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 animate-fadeIn">
+          <div className="bg-slate-900 border border-brand-accent/40 rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden relative max-h-[92vh] flex flex-col">
+            
+            {/* Modal Header */}
+            <div className="p-6 border-b border-white/10 flex items-center justify-between bg-gradient-to-r from-slate-900 via-brand-accent/10 to-slate-900">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-mono font-bold text-brand-accent uppercase px-2.5 py-0.5 rounded-full bg-brand-accent/15 border border-brand-accent/30">
+                    {activeCaseStudy.status} CASE STUDY
+                  </span>
+                  <span className="text-xs font-mono text-cyan-400">
+                    {activeCaseStudy.category}
+                  </span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-extrabold text-white font-sans">
+                  {activeCaseStudy.title}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveCaseStudy(null)}
+                className="p-2 rounded-xl hover:bg-white/10 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                aria-label="Close case study"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 sm:p-8 overflow-y-auto space-y-8 font-sans">
+              
+              {/* Overview & Subtitle */}
+              <div>
+                <p className="text-base text-cyan-300 font-mono mb-2">
+                  {activeCaseStudy.subtitle}
+                </p>
+                <p className="text-sm sm:text-base text-slate-200 leading-relaxed">
+                  {activeCaseStudy.overview}
+                </p>
               </div>
 
-              {/* Preview Image Hero Block */}
-              {proj.image && (
-                <div 
-                  onClick={() => setSelectedProject(proj.id)}
-                  className="aspect-[16/10] w-full overflow-hidden bg-slate-950 relative border-b border-white/5 cursor-pointer z-10"
-                >
-                  <img
-                    src={proj.image}
-                    alt={proj.title}
-                    referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                  />
-                  {/* Subtle hover blur & expand effect overlays */}
-                  <div className="absolute inset-0 bg-[#02050e]/65 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
-                    <span className="bg-brand-light-blue text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg flex items-center space-x-1.5 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-                      <Eye className="h-4 w-4" />
-                      <span>Explore Case Study</span>
-                    </span>
-                  </div>
+              {/* Problem Statement Card */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-rose-950/40 border border-rose-500/30 space-y-1.5">
+                <div className="flex items-center gap-2 text-rose-400 font-mono text-xs font-bold uppercase tracking-wider">
+                  <AlertTriangle className="w-4 h-4" />
+                  <span>The Business Problem</span>
                 </div>
-              )}
+                <p className="text-sm text-rose-100 leading-relaxed">
+                  {activeCaseStudy.problem}
+                </p>
+              </div>
 
-              {/* Description & info metadata */}
-              <div className="p-6 border-b border-white/5 bg-gradient-to-b from-brand-blue/5 to-transparent flex-grow flex flex-col justify-between">
-                <div>
-                  <div className="h-8 w-8 rounded-lg bg-brand-light-blue/10 text-brand-light-blue flex items-center justify-center mb-3">
-                    <LucideIcon name={proj.icon} size={16} />
+              {/* Trigger & Automation Logic */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-slate-950/70 border border-cyan-500/30 space-y-2">
+                <div className="flex items-center gap-2 text-cyan-400 font-mono text-xs font-bold uppercase tracking-wider">
+                  <FileCode className="w-4 h-4" />
+                  <span>Trigger &amp; Automation Logic</span>
+                </div>
+                <p className="text-xs sm:text-sm text-slate-300 font-mono leading-relaxed bg-black/40 p-3 rounded-xl border border-white/5">
+                  {activeCaseStudy.triggerLogic}
+                </p>
+              </div>
+
+              {/* 5-Step Pipeline */}
+              <div className="space-y-4">
+                <h4 className="text-base font-bold text-white font-sans uppercase tracking-wider font-mono text-xs text-brand-accent">
+                  End-to-End Pipeline Steps
+                </h4>
+                <div className="space-y-3">
+                  {activeCaseStudy.pipeline.map((step) => (
+                    <div key={step.stepNumber} className="flex items-start gap-3.5 p-3.5 rounded-xl bg-white/5 border border-white/5">
+                      <div className="w-7 h-7 rounded-full bg-brand-accent/20 border border-brand-accent/40 text-brand-accent font-mono text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                        {step.stepNumber}
+                      </div>
+                      <div>
+                        <span className="text-sm font-bold text-white block">{step.title}</span>
+                        <p className="text-xs sm:text-sm text-slate-300 mt-0.5 leading-relaxed">{step.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Visual Workflow Architecture */}
+              <div className="space-y-3">
+                <h4 className="text-base font-bold text-white font-sans uppercase tracking-wider font-mono text-xs text-cyan-400">
+                  Visual Workflow Architecture
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {activeCaseStudy.architectureSteps.map((node, nIdx) => (
+                    <div key={nIdx} className="p-3 rounded-xl bg-slate-950 border border-white/10 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-mono text-slate-400">Node {nIdx + 1}</span>
+                        <span className="text-[9px] font-mono font-bold text-brand-accent uppercase px-1.5 py-0.5 rounded bg-brand-accent/15 border border-brand-accent/30">
+                          {node.type}
+                        </span>
+                      </div>
+                      <span className="text-xs font-bold text-white block truncate">{node.label}</span>
+                      <p className="text-[11px] text-slate-400 leading-snug">{node.sublabel}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Client Experience & Potential Business Value */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 rounded-xl bg-emerald-950/30 border border-emerald-500/20 space-y-2">
+                  <div className="flex items-center gap-2 text-emerald-400 font-mono text-xs font-bold uppercase">
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Client Experience</span>
                   </div>
-                  <h3 className="text-md font-bold text-white tracking-tight leading-snug group-hover:text-brand-light-blue transition-colors">
-                    {proj.title}
-                  </h3>
-                  <p className="text-xs text-gray-400 leading-relaxed mt-2 line-clamp-3">
-                    {proj.description}
+                  <p className="text-xs sm:text-sm text-emerald-200 leading-relaxed">
+                    &ldquo;{activeCaseStudy.clientExperience}&rdquo;
                   </p>
                 </div>
-              </div>
 
-              {/* Stats/Metrics Block */}
-              <div className="grid grid-cols-3 gap-1 border-b border-white/5 bg-white/[0.01]">
-                {proj.stats.map((stat, sIdx) => (
-                  <div key={sIdx} className="text-center py-3 border-r border-white/5 last:border-r-0">
-                    <span className="text-[9px] font-mono text-gray-500 block uppercase tracking-wider">
-                      {stat.label}
-                    </span>
-                    <span className="text-xs font-extrabold text-white font-sans mt-0.5 block">
-                      {stat.value}
-                    </span>
+                <div className="p-4 rounded-xl bg-amber-950/30 border border-amber-500/20 space-y-2">
+                  <div className="flex items-center gap-2 text-amber-400 font-mono text-xs font-bold uppercase">
+                    <Lightbulb className="w-4 h-4" />
+                    <span>Business Value</span>
                   </div>
-                ))}
+                  <ul className="space-y-1 text-xs text-amber-100 list-disc list-inside leading-relaxed">
+                    {activeCaseStudy.businessValue.map((val, vIdx) => (
+                      <li key={vIdx}>{val}</li>
+                    ))}
+                  </ul>
+                </div>
               </div>
 
-              {/* Tag/Tools & Button list */}
-              <div className="p-6 space-y-4">
-                {/* Tool Tech Stack list */}
-                <div className="flex flex-wrap gap-1.5">
-                  {proj.tools.map((t, idx) => (
-                    <span
+              {/* Tools & Transparency Notice */}
+              <div className="space-y-2 pt-2 border-t border-white/10">
+                <div className="flex flex-wrap gap-2 items-center">
+                  <span className="text-xs font-mono text-slate-400">Tools:</span>
+                  {activeCaseStudy.toolsUsed.map((tool, idx) => (
+                    <span key={idx} className="px-2 py-0.5 rounded text-xs font-mono bg-white/10 text-slate-200 border border-white/10">
+                      {tool}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2 text-[11px] text-slate-400 font-mono pt-1">
+                  <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Status: <strong>{activeCaseStudy.status}</strong> workflow. Designed for studio implementation with no fabricated metrics.</span>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-5 border-t border-white/10 bg-slate-950 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveCaseStudy(null);
+                  handleContactClick();
+                }}
+                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-brand-accent hover:bg-orange-500 text-white text-xs font-mono font-bold uppercase tracking-wider cursor-pointer transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand-accent/20"
+              >
+                <span>Contact Me For a Similar Workflow</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveCaseStudy(null)}
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-xs font-mono uppercase tracking-wider cursor-pointer transition-all"
+              >
+                Close Case Study
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* Architecture Blueprint Modal for Secondary Builds */}
+      {activeBlueprintModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-slate-900 border border-white/10 rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden relative max-h-[90vh] flex flex-col">
+            
+            <div className="p-5 border-b border-white/10 flex items-center justify-between bg-slate-950">
+              <div>
+                <span className="text-[10px] font-mono font-bold text-cyan-400 uppercase tracking-wider block">
+                  {activeBlueprintModal.tag}
+                </span>
+                <h3 className="text-lg font-bold text-white font-sans">
+                  {activeBlueprintModal.title}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveBlueprintModal(null)}
+                className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                aria-label="Close modal"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto space-y-4">
+              <p className="text-sm text-slate-300 font-sans leading-relaxed">
+                {activeBlueprintModal.description}
+              </p>
+
+              <div className="rounded-xl overflow-hidden border border-white/10 bg-slate-950 p-2">
+                <img 
+                  src={activeBlueprintModal.image} 
+                  alt={activeBlueprintModal.title}
+                  referrerPolicy="no-referrer"
+                  className="w-full h-auto max-h-[440px] object-contain rounded-lg"
+                />
+              </div>
+
+              <div className="pt-2">
+                <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider block mb-2">
+                  Integrated Technologies:
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {activeBlueprintModal.tools.map((t, idx) => (
+                    <span 
                       key={idx}
-                      className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-brand-blue/20 text-brand-light-blue border border-brand-blue/30"
+                      className="px-2.5 py-1 rounded-md text-xs font-mono bg-white/5 border border-white/10 text-slate-200"
                     >
                       {t}
                     </span>
                   ))}
                 </div>
-
-                <button
-                  onClick={() => setSelectedProject(proj.id)}
-                  className="w-full inline-flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-white hover:bg-brand-blue/20 hover:border-brand-blue/50 transition-all cursor-pointer"
-                >
-                  <Eye className="h-4 w-4" />
-                  <span>View System Architecture</span>
-                </button>
               </div>
             </div>
-          ))}
-        </div>
 
-        {/* Full Interactive Details Modal Overlay */}
-        {selectedProject && activeProjectData && (
-          <div className="fixed inset-0 z-50 overflow-y-auto bg-brand-dark/90 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-slate-900 rounded-2xl border border-brand-blue/40 w-full max-w-2xl shadow-2xl overflow-hidden relative max-h-[90vh] flex flex-col justify-between">
-              
-              {/* Modal Header */}
-              <div className="p-6 border-b border-white/5 flex items-start justify-between bg-gradient-to-r from-brand-blue/20 to-transparent">
-                <div className="flex items-center space-x-3">
-                  <div className="h-10 w-10 rounded-lg bg-brand-light-blue/10 text-brand-light-blue flex items-center justify-center shrink-0">
-                    <LucideIcon name={activeProjectData.icon} size={18} />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-mono text-brand-light-blue tracking-wide block uppercase uppercase font-bold">
-                      {activeProjectData.category}
-                    </span>
-                    <h3 className="text-lg font-extrabold text-white leading-tight">
-                      {activeProjectData.title}
-                    </h3>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setSelectedProject(null)}
-                  className="p-1 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-
-              {/* Modal Body */}
-              <div className="p-6 overflow-y-auto space-y-6 flex-grow text-sm">
-                
-                {/* Overview prompt */}
-                <div className="space-y-2">
-                  <span className="text-xs font-mono text-gray-400 uppercase tracking-widest block">
-                    PROJECT OBJECTIVE & CONTEXT
-                  </span>
-                  <p className="text-gray-300 leading-relaxed font-sans font-normal">
-                    {activeProjectData.description}
-                  </p>
-                </div>
-
-                 {/* Key Benefits / impact banner */}
-                <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 flex items-start space-x-3">
-                  <Award className="h-5 w-5 text-emerald-400 shrink-0 mt-0.5" />
-                  <div>
-                    <span className="text-xs font-mono text-emerald-400 font-bold uppercase block">
-                      DELIVERED OUTCOME / ROI
-                    </span>
-                    <p className="text-xs text-gray-300 mt-1">
-                      {activeProjectData.impact}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Original Workflow Blueprint */}
-                {activeProjectData.image && (
-                  <div className="space-y-3">
-                    <span className="text-xs font-mono text-gray-400 uppercase tracking-widest block">
-                      ORIGINAL WORKFLOW BLUEPRINT
-                    </span>
-                    <div className="rounded-2xl overflow-hidden border border-white/10 bg-slate-950/80 relative group p-3 flex flex-col items-center">
-                      <img
-                        src={activeProjectData.image}
-                        alt={`${activeProjectData.title} blueprint`}
-                        referrerPolicy="no-referrer"
-                        className="w-full h-auto max-h-[320px] md:max-h-[400px] object-contain rounded-xl select-none"
-                      />
-                      <a
-                        href={activeProjectData.image}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="absolute bottom-6 right-6 bg-slate-950/95 text-white hover:bg-slate-900 border border-white/10 hover:border-brand-blue/50 px-4 py-2 rounded-xl text-xs font-bold font-sans flex items-center space-x-2 transition-all shadow-xl hover:scale-[1.03] active:scale-[0.98] cursor-pointer"
-                      >
-                        <ArrowUpRight className="h-4 w-4 text-brand-light-blue" />
-                        <span>Open Original Size</span>
-                      </a>
-                    </div>
-                  </div>
-                )}
-
-                {/* Visual Flowchart Canvas */}
-                {activeProjectData.nodes && activeProjectData.nodes.length > 0 && (
-                  <div className="space-y-3">
-                    <span className="text-xs font-mono text-gray-400 uppercase tracking-widest block">
-                      LIVE SYSTEM FLOW ARCHITECTURE
-                    </span>
-                    <div className="p-5 rounded-2xl bg-slate-950 border border-white/10 relative overflow-x-auto min-h-[160px] flex items-center justify-start gap-3 scrollbar-thin scrollbar-thumb-white/10 select-none">
-                      {/* Flex row of nodes with connection arrows */}
-                      <div className="flex items-center space-x-3 shrink-0 py-2">
-                        {activeProjectData.nodes.map((node, nIdx) => {
-                          // Determine color scheme based on node type
-                          let typeColor = 'bg-brand-blue/10 border-brand-blue/30 text-brand-light-blue';
-                          let typeLabel = 'Action';
-                          if (node.type === 'trigger') {
-                            typeColor = 'bg-[#ff6c37]/10 border-[#ff6c37]/30 text-[#ff6c37] ring-1 ring-[#ff6c37]/20';
-                            typeLabel = 'Trigger';
-                          } else if (node.type === 'condition') {
-                            typeColor = 'bg-amber-500/10 border-amber-500/30 text-amber-400';
-                            typeLabel = 'Filter';
-                          } else if (node.type === 'complete') {
-                            typeColor = 'bg-emerald-500/10 border-emerald-500/30 text-emerald-450 ring-1 ring-emerald-500/20';
-                            typeLabel = 'Endpoint';
-                          } else if (node.type === 'router') {
-                            typeColor = 'bg-purple-500/10 border-purple-500/30 text-purple-400';
-                            typeLabel = 'Router';
-                          } else if (node.type === 'loop') {
-                            typeColor = 'bg-teal-500/10 border-teal-500/30 text-teal-400';
-                            typeLabel = 'Loop';
-                          } else if (node.type === 'delay') {
-                            typeColor = 'bg-blue-500/10 border-blue-500/30 text-blue-400';
-                            typeLabel = 'Delay';
-                          }
-
-                          // Get matching Lucide icon names depending on application or name
-                          let iconName = 'Cpu';
-                          const appL = node.app.toLowerCase();
-                          if (appL.includes('gmail') || appL.includes('mail')) iconName = 'Mail';
-                          else if (appL.includes('asana')) iconName = 'CheckCircle';
-                          else if (appL.includes('xero')) iconName = 'DollarSign';
-                          else if (appL.includes('sheets') || appL.includes('spreadsheet')) iconName = 'Database';
-                          else if (appL.includes('drive')) iconName = 'Server';
-                          else if (appL.includes('gemini') || appL.includes('ai')) iconName = 'Sparkles';
-                          else if (appL.includes('slack')) iconName = 'MessageSquare';
-                          else if (appL.includes('apollo')) iconName = 'Shield';
-                          else if (appL.includes('youform') || appL.includes('tally')) iconName = 'FileText';
-                          else if (appL.includes('notion')) iconName = 'Database';
-                          else if (appL.includes('facebook')) iconName = 'Plus';
-                          else if (appL.includes('linkedin')) iconName = 'Linkedin';
-                          else if (node.type === 'trigger') iconName = 'Zap';
-                          else if (node.type === 'router') iconName = 'Layers';
-                          else if (node.type === 'loop') iconName = 'Cpu';
-                          else if (node.type === 'delay') iconName = 'Clock';
-
-                          return (
-                            <React.Fragment key={node.id}>
-                              {/* Connection Arrow before node (if not first) */}
-                              {nIdx > 0 && (
-                                <div className="flex flex-col items-center justify-center shrink-0">
-                                  {/* Connector Line */}
-                                  <div className="flex items-center">
-                                    <div className="h-[2px] w-4 bg-gradient-to-r from-brand-blue/30 to-brand-blue/60" />
-                                    {/* Arrow icon */}
-                                    <span className="text-brand-light-blue text-[10px] font-mono font-bold ml-[-2px] select-none">▶</span>
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Interactive Node Card */}
-                              <div className={`p-3 rounded-xl border ${typeColor} text-left w-48 shrink-0 transition-all hover:scale-[1.02] hover:bg-white/[0.02] relative group shadow-sm`}>
-                                {/* Pulse light for triggers / connections */}
-                                {node.type === 'trigger' && (
-                                  <span className="absolute top-2.5 right-2.5 flex h-1.5 w-1.5">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ff6c37] opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#ff6c37]"></span>
-                                  </span>
-                                )}
-                                {node.type === 'complete' && (
-                                  <span className="absolute top-2.5 right-2.5 flex h-1.5 w-1.5">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400"></span>
-                                  </span>
-                                )}
-
-                                <div className="flex items-center space-x-2">
-                                  <div className="h-6 w-6 rounded bg-white/5 border border-white/10 text-white flex items-center justify-center shrink-0">
-                                    <LucideIcon name={iconName} size={12} className="opacity-90" />
-                                  </div>
-                                  <div className="overflow-hidden">
-                                    <span className="text-[8px] font-mono opacity-80 uppercase tracking-widest block font-bold leading-none">
-                                      {node.app} • {typeLabel}
-                                    </span>
-                                    <h4 className="text-[11px] font-extrabold text-white truncate pr-2 tracking-tight mt-0.5">
-                                      {node.label}
-                                    </h4>
-                                  </div>
-                                </div>
-                                <p className="text-[9px] text-gray-400 mt-1.5 leading-snug line-clamp-2">
-                                  {node.desc}
-                                </p>
-                              </div>
-                            </React.Fragment>
-                          );
-                        })}
-                      </div>
-                    </div>
-                    {/* Prompt scroll tip to client */}
-                    <span className="text-[9px] text-gray-500 font-mono italic block text-right">
-                      ↔ Swipe horizontally to trace complete validation loop
-                    </span>
-                  </div>
-                )}
-
-                {/* Automation Features specification list */}
-                <div className="space-y-3">
-                  <span className="text-xs font-mono text-gray-400 uppercase tracking-widest block">
-                    CONNECTED CAPABILITIES
-                  </span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {activeProjectData.features.map((feat, idx) => (
-                      <div
-                        key={idx}
-                        className="p-3 rounded-lg bg-white/5 border border-white/5 text-xs text-gray-300 flex items-start space-x-2"
-                      >
-                        <Check className="h-4 w-4 text-brand-light-blue shrink-0 mt-0.5" />
-                        <span>{feat}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Tools details */}
-                <div className="space-y-2">
-                  <span className="text-xs font-mono text-gray-400 uppercase tracking-widest block">
-                    SYSTEM TOOLSTACK INTEGRATION
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    {activeProjectData.tools.map((tls, idx) => (
-                      <span
-                        key={idx}
-                        className="px-3 py-1 rounded-lg text-xs font-mono bg-brand-blue/30 text-white border border-brand-blue/20"
-                      >
-                        🛠️ {tls}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Modal Footer */}
-              <div className="p-6 border-t border-white/5 bg-slate-950 flex justify-end">
-                <button
-                  onClick={() => setSelectedProject(null)}
-                  className="px-5 py-2.5 rounded-lg bg-brand-light-blue text-white text-xs font-bold hover:bg-brand-light-blue/90 transition-colors cursor-pointer"
-                >
-                  Close Architecture Map
-                </button>
-              </div>
-
+            <div className="p-4 border-t border-white/10 bg-slate-950 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setActiveBlueprintModal(null)}
+                className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-mono uppercase tracking-wider cursor-pointer"
+              >
+                Close Blueprint
+              </button>
             </div>
+
           </div>
-        )}
+        </div>
+      )}
 
-      </div>
     </section>
   );
 };

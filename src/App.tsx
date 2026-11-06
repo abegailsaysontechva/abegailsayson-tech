@@ -8,13 +8,26 @@ import Process from './components/Process';
 import ToolsAndPlatforms from './components/ToolsAndPlatforms';
 import BookingScheduler from './components/BookingScheduler';
 import ContactForm from './components/ContactForm';
+import Footer from './components/Footer';
 import MouseFollower from './components/MouseFollower';
+import SEOHead from './components/SEOHead';
+import AboutPage from './pages/AboutPage';
+import ServicesPage from './pages/ServicesPage';
+import PortfolioPage from './pages/PortfolioPage';
+import BlogPage from './pages/BlogPage';
+import CaseStudyPage from './pages/CaseStudyPage';
 import { BookingSubmission, FormSubmission } from './types';
 import { CheckCircle } from 'lucide-react';
+import { CaseStudy } from './data/caseStudiesData';
 
 export default function App() {
   const emailContact = "abegailsaysontechva@gmail.com";
   
+  // Navigation / Routing State
+  const [currentPath, setCurrentPath] = useState<string>(() => {
+    return window.location.pathname || '/';
+  });
+
   // State variables for dynamic data interactions
   const [activeNavSection, setActiveNavSection] = useState('services');
   const [bookings, setBookings] = useState<BookingSubmission[]>([]);
@@ -43,7 +56,44 @@ export default function App() {
     });
   };
 
-  // Load from localStorage on mount
+  // Listen to browser navigation popstate (Back/Forward buttons)
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentPath(window.location.pathname || '/');
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Programmatic Navigate function
+  const navigate = (path: string) => {
+    // Check if target is an anchor on the homepage, e.g. '/#contact'
+    if (path.includes('#')) {
+      const [route, hash] = path.split('#');
+      const targetRoute = route || '/';
+      if (window.location.pathname !== targetRoute) {
+        window.history.pushState({}, '', path);
+        setCurrentPath(targetRoute);
+      }
+      setTimeout(() => {
+        const el = document.getElementById(hash);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+      return;
+    }
+
+    if (window.location.pathname !== path) {
+      window.history.pushState({}, '', path);
+      setCurrentPath(path);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  // Load bookings/inquiries from localStorage on mount
   useEffect(() => {
     try {
       const savedBookings = localStorage.getItem('abegails_bookings');
@@ -55,10 +105,12 @@ export default function App() {
     }
   }, []);
 
-  // Update navbar section based on scrolling position
+  // Update navbar section based on scrolling position when on homepage
   useEffect(() => {
+    if (currentPath !== '/') return;
+
     const handleScroll = () => {
-      const sections = ['services', 'portfolio', 'process', 'contact'];
+      const sections = ['services', 'about', 'demos', 'process', 'contact'];
       const scrollPos = window.scrollY + 200;
 
       for (const section of sections) {
@@ -76,7 +128,7 @@ export default function App() {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [currentPath]);
 
   const triggerToast = (msg: string) => {
     setToastMessage(msg);
@@ -89,31 +141,25 @@ export default function App() {
     const updatedBookings = [newBooking, ...bookings];
     setBookings(updatedBookings);
     localStorage.setItem('abegails_bookings', JSON.stringify(updatedBookings));
-    
-    triggerToast(`📅 Discovery session booked successfully! synced with lead tracker database.`);
+    triggerToast(`📅 Discovery session booked successfully! Synced with lead tracker.`);
   };
 
   const handleInquirySuccess = (newInquiry: FormSubmission) => {
     const updatedInquiries = [newInquiry, ...inquiries];
     setInquiries(updatedInquiries);
     localStorage.setItem('abegails_inquiries', JSON.stringify(updatedInquiries));
-    
-    triggerToast(`📬 Message submitted successfully!`);
-  };
-
-  const handleClearAllLocalData = () => {
-    setBookings([]);
-    setInquiries([]);
-    localStorage.removeItem('abegails_bookings');
-    localStorage.removeItem('abegails_inquiries');
-    triggerToast(`🧹 Checked out! Active session database flushed successfully.`);
+    triggerToast(`📬 Message submitted successfully! Reply scheduled within 24 hours.`);
   };
 
   // Scroll handler tool
   const scrollSectionToView = (id: string) => {
+    if (currentPath !== '/') {
+      navigate(`/#${id}`);
+      return;
+    }
     const element = document.getElementById(id);
     if (element) {
-      const offset = 80;
+      const offset = 90;
       const elementPosition = element.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - offset;
       
@@ -124,67 +170,162 @@ export default function App() {
     }
   };
 
+  // Route matching helpers
+  const isCaseStudyRoute = currentPath.startsWith('/case-study/');
+  const caseStudySlug = isCaseStudyRoute ? currentPath.replace('/case-study/', '').replace(/\/$/, '') : null;
+
+  const isBlogRoute = currentPath.startsWith('/blog');
+  const blogSlug = currentPath.startsWith('/blog/') ? currentPath.replace('/blog/', '').replace(/\/$/, '') : null;
+
   return (
-    <div className={`theme-${theme} bg-slate-950 min-h-screen smooth-scroll overflow-x-hidden selection:bg-brand-accent selection:text-white relative transition-colors duration-300`}>
+    <div id="top" className={`theme-${theme} min-h-screen smooth-scroll overflow-x-hidden selection:bg-brand-accent selection:text-white relative transition-colors duration-300`}>
       
-      {/* Global Moving Wavy Vibrant Orange Background Sheets */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute inset-0 bg-[#040815] transition-colors duration-300" />
-        
-        {/* Floating Dynamic SVG Waves */}
-        <svg
-          className="absolute inset-x-0 bottom-0 w-full h-[85%] opacity-20 md:opacity-25"
-          viewBox="0 0 1440 600"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          preserveAspectRatio="none"
+      {/* Homepage SEO & Schemas */}
+      {currentPath === '/' && (
+        <SEOHead
+          title="Abegail Sayson Tech | AI Automation Specialist for Photographers"
+          description="I build practical automation systems that help photographers manage leads, streamline bookings, automate client follow-ups, and reduce repetitive administrative tasks."
+          canonicalPath="/"
+          schemaData={{
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: [
+              {
+                '@type': 'Question',
+                name: 'What is photography business automation?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Photography business automation connects your website, inquiry forms, email, calendar, and CRM so repetitive tasks run automatically. It handles instant replies, pricing delivery, consultation scheduling, contract signing, and invoice reminders without manual intervention.'
+                }
+              },
+              {
+                '@type': 'Question',
+                name: 'How can photographers automate client inquiries?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'By connecting your website inquiry form to a workflow engine (such as n8n or Make). When a lead submits a form, the system immediately logs their details into your CRM, dispatches a personalized welcome email with your investment guide, and sends you an instant mobile alert.'
+                }
+              },
+              {
+                '@type': 'Question',
+                name: 'Can a photography website automatically manage booking inquiries?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Yes. A booking funnel website qualifies the client’s date and budget upfront, presents relevant packages, delivers your pricing guide, and offers a direct calendar scheduler for a consultation call—moving leads from discovery to booked automatically.'
+                }
+              },
+              {
+                '@type': 'Question',
+                name: 'What is a photography CRM workflow?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'A photography CRM workflow is a centralized pipeline (in Notion, GoHighLevel, or HubSpot) that tracks every client through structured stages: New Inquiry, Pricing Sent, Consultation Booked, Contract Signed, Retainer Paid, Session Shot, Gallery Delivered, and Review Received.'
+                }
+              },
+              {
+                '@type': 'Question',
+                name: 'How can photographers automate client follow-ups?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Through timed delay nodes in your automation pipeline. If an inquiry receives your pricing guide but does not schedule a consultation within 48 hours, a friendly, personalized follow-up is triggered automatically, recovering warm leads without manual effort.'
+                }
+              },
+              {
+                '@type': 'Question',
+                name: 'Can automation help photography studios manage bookings?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Absolutely. Automation coordinates the entire onboarding sequence: sending digital contracts for e-signature, generating Stripe deposit invoices, collecting pre-session questionnaires, and dispatching wardrobe guides and location reminders.'
+                }
+              },
+              {
+                '@type': 'Question',
+                name: 'What automation services does Abegail Sayson Tech offer?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'Abegail Sayson Tech builds photography lead management systems, CRM automation, booking funnels, automated follow-up sequences, client onboarding pipelines, gallery delivery review engines, and custom workflow architectures.'
+                }
+              },
+              {
+                '@type': 'Question',
+                name: 'Who owns the system?',
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: 'You do. Your website, accounts, automations, and client data are set up under your own logins, and I hand over full access when the project is complete. If we stop working together, everything keeps running.'
+                }
+              }
+            ]
+          }}
+        />
+      )}
+
+      {/* Single Fixed Background Layer for the Whole Page */}
+      {theme !== 'light' && (
+        <div
+          id="site-bg"
+          aria-hidden="true"
+          style={{ position: 'fixed', inset: 0, zIndex: -1, pointerEvents: 'none' }}
         >
-          <defs>
-            <linearGradient id="globalWaveOrangeGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#f37021" stopOpacity="0.8" />
-              <stop offset="100%" stopColor="#ff5a00" stopOpacity="0" />
-            </linearGradient>
-            <linearGradient id="globalWaveOrangeGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#ff5a00" stopOpacity="0.6" />
-              <stop offset="100%" stopColor="#e04e00" stopOpacity="0" />
-            </linearGradient>
-            <linearGradient id="globalWaveOrangeGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#ff9f59" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#f37021" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          
-          <path
-            className="animate-wave1"
-            fill="url(#globalWaveOrangeGrad1)"
-            d="M0,220 Q360,120 720,220 T1440,220 L1440,600 L0,600 Z"
-          />
-          
-          <path
-            className="animate-wave2"
-            fill="url(#globalWaveOrangeGrad2)"
-            d="M0,280 Q360,360 720,280 T1440,280 L1440,600 L0,600 Z"
+          <svg
+            viewBox="0 0 1440 900"
+            preserveAspectRatio="xMidYMid slice"
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-full h-full"
+          >
+            <defs>
+              <linearGradient id="bgBlue" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stopColor="#0A2A6B" />
+                <stop offset="1" stopColor="#050B24" />
+              </linearGradient>
+              <linearGradient id="bgOrange" x1="0" y1="1" x2="1" y2="0">
+                <stop offset="0" stopColor="#F97316" />
+                <stop offset="0.55" stopColor="#C2410C" />
+                <stop offset="1" stopColor="#7F1D1D" />
+              </linearGradient>
+              <radialGradient id="bgGlow" cx="70%" cy="10%" r="45%">
+                <stop offset="0" stopColor="#2DB7F5" stopOpacity="0.40" />
+                <stop offset="1" stopColor="#2DB7F5" stopOpacity="0" />
+              </radialGradient>
+            </defs>
+            <rect width="1440" height="900" fill="url(#bgBlue)" />
+            <rect width="1440" height="900" fill="url(#bgGlow)" />
+            <path
+              className="opacity-[0.55] md:opacity-[0.7]"
+              d="M0 830 C 500 770, 920 650, 1440 270 L1440 900 L0 900 Z"
+              fill="url(#bgOrange)"
+            />
+            <path
+              d="M0 830 C 500 770, 920 650, 1440 270"
+              fill="none"
+              stroke="rgba(255,255,255,0.16)"
+              strokeWidth="3"
+            />
+          </svg>
+
+          {/* Desktop Fixed Overlay */}
+          <div
+            className="hidden md:block absolute inset-0 pointer-events-none"
+            style={{
+              background: 'linear-gradient(180deg, rgba(5,8,22,0.55) 0%, rgba(5,8,22,0.60) 50%, rgba(5,8,22,0.75) 100%)',
+            }}
           />
 
-          <path
-            className="animate-wave3"
-            fill="url(#globalWaveOrangeGrad3)"
-            d="M0,350 Q360,250 720,350 T1440,350 L1440,600 L0,600 Z"
+          {/* Mobile Fixed Overlay */}
+          <div
+            className="block md:hidden absolute inset-0 pointer-events-none"
+            style={{
+              background: 'linear-gradient(180deg, rgba(5,8,22,0.65) 0%, rgba(5,8,22,0.70) 50%, rgba(5,8,22,0.85) 100%)',
+            }}
           />
-        </svg>
-
-        {/* Ambient glowing orange blurs drifting */}
-        <div className="absolute top-[5%] right-[5%] w-[55%] h-[55%] rounded-full bg-brand-accent/15 blur-[140px] animate-driftSlow" />
-        <div className="absolute bottom-[10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-[#ff5a00]/12 blur-[170px] animate-driftFast" />
-        <div className="absolute top-[45%] left-[25%] w-[40%] h-[40%] rounded-full bg-brand-accent/8 blur-[150px] animate-driftSlow" />
-      </div>
+        </div>
+      )}
 
       {/* Dynamic Toast Success Notification overlay */}
       {toastMessage && (
         <div className="fixed top-24 right-4 z-50 bg-emerald-950 text-white border border-emerald-500/30 px-5 py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 max-w-sm flex items-start space-x-3 text-sm font-sans animate-slideIn">
           <CheckCircle className="h-5 w-5 text-emerald-400 shrink-0 mt-0.5 animate-pulse" />
           <div className="space-y-1">
-            <span className="font-bold text-white block">Operation Triggered</span>
+            <span className="font-bold text-white block">Status Updated</span>
             <p className="text-xs text-gray-300 leading-normal">{toastMessage}</p>
           </div>
         </div>
@@ -197,111 +338,173 @@ export default function App() {
         setActiveNavSection={setActiveNavSection}
         theme={theme}
         toggleTheme={toggleTheme}
+        currentPath={currentPath}
+        onNavigate={navigate}
       />
 
-      {/* Main Container Sections */}
+      {/* Main Container Content */}
       <main>
-        
-        {/* Banner Segment */}
-        <Hero
-          onBookCallClick={() => scrollSectionToView('contact')}
-          onViewWorkClick={() => scrollSectionToView('portfolio')}
-        />
+        {/* Route 1: About Page */}
+        {currentPath === '/about-abegail-sayson' && (
+          <AboutPage 
+            onNavigate={navigate} 
+            onBookCallClick={() => scrollSectionToView('contact')} 
+          />
+        )}
 
-        {/* Custom interactive services section */}
-        <Services onServiceSelect={(id) => scrollSectionToView('contact')} />
+        {/* Route 2: Photography Automation Services Page */}
+        {currentPath === '/photography-automation' && (
+          <ServicesPage 
+            onNavigate={navigate} 
+            onBookCallClick={() => scrollSectionToView('contact')} 
+          />
+        )}
 
-        {/* Personalized Bio Intro */}
-        <About />
+        {/* Route 3: Portfolio & Case Studies Page */}
+        {currentPath === '/portfolio' && (
+          <PortfolioPage 
+            onNavigate={navigate} 
+            onBookCallClick={() => scrollSectionToView('contact')} 
+          />
+        )}
 
-        {/* Case histories case-studies columns */}
-        <Portfolio />
+        {/* Route 4: Dedicated Case Study Page */}
+        {isCaseStudyRoute && caseStudySlug && (
+          <CaseStudyPage 
+            studyId={caseStudySlug} 
+            onNavigate={navigate} 
+            onBookCallClick={() => scrollSectionToView('contact')} 
+          />
+        )}
 
-        {/* My Process section with integrated CTA */}
-        <Process onBookCallClick={() => scrollSectionToView('contact')} />
+        {/* Route 5: Blog & Article Page */}
+        {isBlogRoute && (
+          <BlogPage 
+            currentSlug={blogSlug} 
+            onNavigate={navigate} 
+            onBookCallClick={() => scrollSectionToView('contact')} 
+          />
+        )}
 
-        {/* Core tools and platforms used in automation with movable parallax background */}
-        <ToolsAndPlatforms />
+        {/* Route 6: Homepage (Default) */}
+        {currentPath === '/' && (
+          <>
+            {/* Hero Section */}
+            <Hero
+              onBookCallClick={() => scrollSectionToView('contact')}
+              onViewWorkClick={() => navigate('/portfolio')}
+            />
 
-        {/* Integrated Booking Scheduler and Form Action Hub */}
-        <section id="contact" className="py-24 bg-transparent text-white relative">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 font-sans">
-            
-            {/* Section Header */}
-            <div className="text-center space-y-4 max-w-3xl mx-auto mb-16">
-              <div className="inline-flex items-center space-x-2 bg-brand-accent/20 border border-brand-accent/30 rounded-full px-3 py-1">
-                <span className="text-xs font-mono font-bold text-brand-accent uppercase tracking-wider">
-                  Conversion Hub
-                </span>
-              </div>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
-                Let's Build Smarter Systems Together
-              </h2>
-              <p className="text-base text-gray-300 max-w-2xl mx-auto">
-                Select your preferred route below. Fast-track operations by booking a slot on Abegail's interactive calendar, or dispatch your requirements instantly using our webform.
-              </p>
-            </div>
+            {/* Custom Interactive Services Section */}
+            <Services onServiceSelect={() => scrollSectionToView('contact')} />
 
-            {/* Parallel actions grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-6xl mx-auto items-stretch">
-              
-              {/* Option 1: Calendar booking */}
-              <div className="lg:col-span-6 flex flex-col justify-start">
-                <div className="space-y-4 mb-6 lg:min-h-[144px]">
-                  <span className="text-xs font-bold font-mono text-brand-accent bg-brand-accent/20 px-2.5 py-1 rounded-full uppercase border border-brand-accent/30 animate-pulse">
-                    🥇 Preferred Option
-                  </span>
-                  <p className="font-sans font-extrabold text-xl text-white tracking-tight leading-snug">
-                    Schedule a 25-Min Setup Audit
-                  </p>
-                  <p className="text-sm text-gray-400 leading-relaxed font-sans font-normal">
-                    Let’s analyze your repetitive workflow pain points face-to-face. Secure an available consultation slot on Abegail's synchronized calendar widget to your right.
+            {/* Editorial Bio Intro */}
+            <About />
+
+            {/* Portfolio / Demo Funnels */}
+            <Portfolio 
+              onOpenCaseStudy={(study: CaseStudy) => navigate(`/case-study/${study.slug}`)}
+              onBookCallClick={() => scrollSectionToView('contact')}
+            />
+
+            {/* How It Works & Process section with comprehensive FAQs */}
+            <Process onBookCallClick={() => scrollSectionToView('contact')} />
+
+            {/* Tools & Platforms Strip */}
+            <ToolsAndPlatforms />
+
+            {/* Contact & Conversion Section */}
+            <section id="contact" className="py-24 bg-transparent text-white relative section-scrim">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 font-sans">
+                
+                {/* Section Header */}
+                <div className="text-center space-y-4 max-w-3xl mx-auto mb-12">
+                  <div className="inline-flex items-center space-x-2 bg-brand-accent/15 border border-brand-accent/30 rounded-full px-3.5 py-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-brand-accent" />
+                    <span className="text-xs font-mono font-bold text-orange-400 uppercase tracking-wider">
+                      LET&apos;S TALK
+                    </span>
+                  </div>
+                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold tracking-tight text-white leading-tight">
+                    Let&apos;s Automate Your Photography Workflow
+                  </h2>
+                  <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed font-sans">
+                    Have repetitive tasks, scattered inquiries, or a booking process that needs improvement? Let&apos;s explore a practical automation solution for your business.
                   </p>
                 </div>
-                <BookingScheduler onBookingSuccess={handleBookingSuccess} />
-              </div>
 
-              {/* Option 2: Contact form webhook */}
-              <div className="lg:col-span-6 flex flex-col justify-start">
-                <div className="space-y-4 mb-6 lg:min-h-[144px]">
-                  <span className="text-xs font-bold font-mono text-gray-400 bg-white/5 px-2.5 py-1 rounded-full uppercase border border-white/10">
-                    🥈 Email Option
-                  </span>
-                  <p className="font-sans font-extrabold text-xl text-white tracking-tight leading-snug">
-                    Drop Your Operational Requirements
-                  </p>
-                  <p className="text-sm text-gray-400 leading-relaxed font-sans font-normal">
-                    Rather message first? Input your business sector, describe the administrative bottlenecks wasting your team's energy, and dispatch them directly in seconds.
-                  </p>
+                {/* What happens next 3 numbered mini-steps */}
+                <div className="max-w-5xl mx-auto mb-14">
+                  <div className="text-center mb-5">
+                    <span className="text-xs font-mono uppercase tracking-wider text-cyan-400 font-semibold">
+                      What happens next
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="p-4 rounded-xl card-glass flex items-start gap-3.5">
+                      <div className="w-7 h-7 rounded-full bg-brand-accent/15 border border-brand-accent/40 text-brand-accent font-mono text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                        1
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-semibold text-white">You reach out</h3>
+                        <p className="text-xs text-gray-300 mt-1 leading-relaxed">
+                          Book a time or send the form.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="p-4 rounded-xl card-glass flex items-start gap-3.5">
+                      <div className="w-7 h-7 rounded-full bg-brand-accent/15 border border-brand-accent/40 text-brand-accent font-mono text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                        2
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-semibold text-white">I review your studio</h3>
+                        <p className="text-xs text-gray-300 mt-1 leading-relaxed">
+                          I look at your website, inquiry form, and follow-up process before we talk.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="p-4 rounded-xl card-glass flex items-start gap-3.5">
+                      <div className="w-7 h-7 rounded-full bg-brand-accent/15 border border-brand-accent/40 text-brand-accent font-mono text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                        3
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-semibold text-white">You get a plan</h3>
+                        <p className="text-xs text-gray-300 mt-1 leading-relaxed">
+                          Three quick wins and a recommended package, with no obligation.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <ContactForm onSubmittingSuccess={handleInquirySuccess} emailContact={emailContact} />
+
+                {/* Two-column layout (calendar first, form second) */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-6xl mx-auto items-stretch">
+                  
+                  {/* LEFT card: Calendar booking */}
+                  <div className="lg:col-span-6 flex flex-col h-full">
+                    <BookingScheduler onBookingSuccess={handleBookingSuccess} />
+                  </div>
+
+                  {/* RIGHT card: Contact form webhook */}
+                  <div className="lg:col-span-6 flex flex-col h-full">
+                    <ContactForm onSubmittingSuccess={handleInquirySuccess} emailContact={emailContact} />
+                  </div>
+
+                </div>
+
               </div>
-
-            </div>
-
-          </div>
-        </section>
-
+            </section>
+          </>
+        )}
       </main>
 
-      {/* Foot footnotes container */}
-      <footer className="bg-brand-dark text-white border-t border-white/5 pb-8 relative z-10 footer">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Header
-            onBookCallClick={() => scrollSectionToView('contact')}
-            activeNavSection={activeNavSection}
-            setActiveNavSection={setActiveNavSection}
-            theme={theme}
-            toggleTheme={toggleTheme}
-          />
-          
-          <div className="pt-2">
-            <p className="text-[12px] text-gray-500 font-mono text-center leading-normal">
-              © {new Date().getFullYear()} Abegail Sayson | AI Automation Specialist. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+      {/* Global Footer */}
+      <Footer 
+        onNavClick={scrollSectionToView} 
+        onNavigate={navigate}
+      />
 
       <MouseFollower />
 

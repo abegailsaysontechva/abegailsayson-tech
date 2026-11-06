@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Terminal, Sun, Moon } from 'lucide-react';
+import { Menu, X, Sun, Moon } from 'lucide-react';
 
 interface HeaderProps {
   onBookCallClick: () => void;
@@ -7,6 +7,8 @@ interface HeaderProps {
   setActiveNavSection: (section: string) => void;
   theme?: 'dark' | 'light';
   toggleTheme?: () => void;
+  currentPath?: string;
+  onNavigate?: (path: string) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -14,10 +16,14 @@ export const Header: React.FC<HeaderProps> = ({
   activeNavSection,
   setActiveNavSection,
   theme = 'dark',
-  toggleTheme
+  toggleTheme,
+  currentPath = '/',
+  onNavigate
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const logoSrc = theme === 'light' ? '/logo-horizontal-color.png' : '/logo-horizontal-white.png';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,25 +34,59 @@ export const Header: React.FC<HeaderProps> = ({
   }, []);
 
   const navItems = [
-    { id: 'services', label: 'Services' },
-    { id: 'portfolio', label: 'Portfolio' },
-    { id: 'process', label: 'My Process' },
-    { id: 'contact', label: 'Contact' }
+    { id: 'services', label: 'Services', path: '/photography-automation', sectionId: 'services' },
+    { id: 'about', label: 'About', path: '/about-abegail-sayson', sectionId: 'about' },
+    { id: 'demos', label: 'Demos', path: '/portfolio', sectionId: 'demos' },
+    { id: 'process', label: 'How It Works', path: '/', sectionId: 'process' },
+    { id: 'blog', label: 'Blog', path: '/blog', sectionId: null },
+    { id: 'contact', label: 'Contact', path: '/', sectionId: 'contact' }
   ];
 
-  const handleNavClick = (sectionId: string) => {
+  const handleNavClick = (item: typeof navItems[0]) => {
     setIsMobileMenuOpen(false);
-    setActiveNavSection(sectionId);
-    const element = document.getElementById(sectionId);
-    if (element) {
-      const offset = 120;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
-      
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
+
+    // If clicking Blog
+    if (item.id === 'blog') {
+      if (onNavigate) {
+        onNavigate('/blog');
+      }
+      return;
+    }
+
+    // If currently on homepage, smooth-scroll to section
+    if (currentPath === '/') {
+      if (item.sectionId) {
+        setActiveNavSection(item.sectionId);
+        const element = document.getElementById(item.sectionId);
+        if (element) {
+          const offset = 90;
+          const elementPosition = element.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - offset;
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+          return;
+        }
+      }
+    }
+
+    // If on a subpage or item has dedicated path, route appropriately
+    if (onNavigate) {
+      if (item.sectionId === 'contact') {
+        onNavigate('/#contact');
+      } else {
+        onNavigate(item.path);
+      }
+    }
+  };
+
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (currentPath === '/') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (onNavigate) {
+      onNavigate('/');
     }
   };
 
@@ -55,53 +95,53 @@ export const Header: React.FC<HeaderProps> = ({
       id="main-nav-bar"
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? 'bg-slate-950/98 border-b border-brand-accent/25 shadow-lg'
-          : 'bg-slate-950/90 border-b border-brand-accent/10 backdrop-blur-sm'
+          ? 'bg-[rgba(5,8,22,0.92)] border-b border-white/[0.08] backdrop-blur-md shadow-lg'
+          : 'bg-[rgba(5,8,22,0.78)] border-b border-white/[0.06] backdrop-blur-md'
       }`}
     >
-      {/* Main High Contrast Navigation Layer */}
+      {/* Main Navigation Layer */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
         <div className="flex items-center justify-between">
+          
           {/* Logo */}
-          <div 
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="flex items-center cursor-pointer group select-none"
+          <a 
+            href="#top"
+            onClick={handleLogoClick}
+            className="flex items-center cursor-pointer select-none py-1 mr-4 lg:mr-8"
+            aria-label="Abegail Sayson - Automation Services"
           >
-            {/* Logo Text - Restoring Name Abegail Sayson */}
-            <div className="flex flex-col">
-              <div className="flex items-center space-x-1 sm:space-x-1.5 leading-none">
-                <span className="font-sans font-black text-base sm:text-lg tracking-tight text-white group-hover:text-brand-accent transition-colors duration-200 flex items-center">
-                  Abegail Sayson
-                  <span className="inline-block w-1.5 h-3.5 bg-brand-accent ml-1 animate-blink rounded-2xs opacity-80" />
-                </span>
-              </div>
-              <div className="flex items-center space-x-1 mt-0.5">
-                <p className="text-[8px] sm:text-[9px] text-gray-450 font-mono tracking-widest uppercase font-bold">
-                  SAYSON SYSTEMS // AUTOMATION & AI
-                </p>
-              </div>
-            </div>
-          </div>
+            <img
+              src={logoSrc}
+              alt="Abegail Sayson - Automation Services"
+              className="h-[36px] md:h-[44px] w-auto max-h-[44px] object-contain transition-opacity hover:opacity-90"
+              height={44}
+            />
+          </a>
 
-          {/* Desktop Navigation & Actions beside each other */}
+          {/* Desktop Navigation & Actions */}
           <div className="hidden lg:flex items-center space-x-4">
             <nav className="flex items-center space-x-1">
-              {navItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => handleNavClick(item.id)}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-                    activeNavSection === item.id
-                      ? 'text-brand-light-blue bg-brand-blue/20 shadow-sm border border-brand-blue/30'
-                      : 'text-gray-300 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
+              {navItems.map((item) => {
+                const isActive = (currentPath === '/' && activeNavSection === item.id) ||
+                  (item.path !== '/' && currentPath.startsWith(item.path));
+
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleNavClick(item)}
+                    className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 cursor-pointer ${
+                      isActive
+                        ? 'text-orange-400 bg-brand-accent/15 shadow-sm border border-brand-accent/30'
+                        : 'text-gray-300 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                );
+              })}
             </nav>
 
-            {/* Dark & Light Toggle Switch widget */}
+            {/* Dark & Light Toggle Switch */}
             {toggleTheme && (
               <button
                 type="button"
@@ -121,9 +161,9 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               id="header-cta-book"
               onClick={onBookCallClick}
-              className="px-5 py-2.5 rounded-lg bg-brand-accent hover:bg-brand-accent/90 text-white text-sm font-semibold shadow-md transition-all duration-150 transform hover:-translate-y-0.5 border border-brand-accent/20 cursor-pointer whitespace-nowrap"
+              className="px-5 py-2.5 rounded-lg bg-brand-accent hover:bg-orange-500 text-white text-sm font-semibold shadow-md transition-all duration-150 transform hover:-translate-y-0.5 border border-brand-accent/20 cursor-pointer whitespace-nowrap"
             >
-              Let's Connect
+              Free Studio Audit
             </button>
           </div>
 
@@ -146,7 +186,8 @@ export const Header: React.FC<HeaderProps> = ({
             )}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-300 hover:text-white hover:bg-white/5 focus:outline-none border border-white/10 shadow"
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-300 hover:text-white hover:bg-white/5 focus:outline-none border border-white/10 shadow cursor-pointer"
+              aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -156,15 +197,16 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden bg-brand-dark/98 border-b border-brand-blue/30 backdrop-blur-lg animate-fadeIn">
+        <div className="lg:hidden bg-[rgba(5,8,22,0.98)] border-b border-brand-blue/30 backdrop-blur-lg animate-fadeIn">
           <div className="px-4 pt-2 pb-6 space-y-2">
             {navItems.map((item) => (
               <button
                 key={item.id}
-                onClick={() => handleNavClick(item.id)}
-                className={`block w-full text-left px-4 py-3 rounded-md text-base font-medium transition-all duration-200 ${
-                  activeNavSection === item.id
-                    ? 'text-brand-light-blue bg-brand-blue/20 border-l-4 border-brand-light-blue'
+                onClick={() => handleNavClick(item)}
+                className={`block w-full text-left px-4 py-3 rounded-md text-base font-medium transition-all duration-200 cursor-pointer ${
+                  (currentPath === '/' && activeNavSection === item.id) ||
+                  (item.path !== '/' && currentPath.startsWith(item.path))
+                    ? 'text-orange-400 bg-brand-accent/15 border-l-4 border-brand-accent'
                     : 'text-gray-300 hover:text-white hover:bg-white/5'
                 }`}
               >
@@ -177,9 +219,9 @@ export const Header: React.FC<HeaderProps> = ({
                   setIsMobileMenuOpen(false);
                   onBookCallClick();
                 }}
-                className="w-full py-3 px-4 rounded-lg bg-brand-accent hover:bg-brand-accent/90 text-white transition-all duration-200 text-center text-sm font-bold shadow-md"
+                className="w-full py-3 px-4 rounded-lg bg-brand-accent hover:bg-orange-500 text-white transition-all duration-200 text-center text-sm font-bold shadow-md cursor-pointer"
               >
-                Let's Connect
+                Free Studio Audit
               </button>
             </div>
           </div>

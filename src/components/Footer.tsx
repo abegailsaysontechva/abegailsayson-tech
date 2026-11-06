@@ -1,136 +1,127 @@
 import React from 'react';
-import { Terminal, Mail, Github, Linkedin, Twitter, ArrowUp, Send } from 'lucide-react';
+import { Linkedin, Instagram, ArrowUpRight } from 'lucide-react';
 
 interface FooterProps {
-  onNavClick: (sectionId: string) => void;
-  emailContact: string;
+  onNavClick?: (sectionId: string) => void;
+  onNavigate?: (path: string) => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onNavClick, emailContact }) => {
-  const currentYear = new Date().getFullYear();
-
-  const quickLinks = [
-    { id: 'services', label: 'Services' },
-    { id: 'portfolio', label: 'Case Studies' },
-    { id: 'contact', label: 'Contact' }
+export const Footer: React.FC<FooterProps> = ({ onNavClick, onNavigate }) => {
+  const navLinks = [
+    { label: 'Services', path: '/photography-automation', sectionId: 'services' },
+    { label: 'About', path: '/about-abegail-sayson', sectionId: 'about' },
+    { label: 'Portfolio', path: '/portfolio', sectionId: 'demos' },
+    { label: 'How It Works', path: '/', sectionId: 'process' },
+    { label: 'Blog', path: '/blog', sectionId: null },
+    { label: 'Contact', path: '/#contact', sectionId: 'contact' }
   ];
 
-  const handleScrollTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handleLinkClick = (item: typeof navLinks[0], e: React.MouseEvent) => {
+    e.preventDefault();
+    if (onNavigate) {
+      if (item.sectionId && window.location.pathname === '/') {
+        if (onNavClick) onNavClick(item.sectionId);
+      } else {
+        onNavigate(item.path);
+      }
+    } else if (onNavClick && item.sectionId) {
+      onNavClick(item.sectionId);
+    }
+  };
+
+  const handleScrollTop = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (window.location.pathname !== '/' && onNavigate) {
+      onNavigate('/');
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   return (
-    <footer className="bg-brand-dark text-white pt-16 pb-8 border-t border-white/5 relative z-10 font-sans">
+    <footer className="bg-[rgba(5,8,22,0.85)] backdrop-blur-md text-white pt-16 pb-10 border-t border-white/[0.08] relative z-10 font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+        {/* Main Footer Row */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 pb-12 items-start">
           
-          {/* Column 1: Info & Brand */}
-          <div className="space-y-4">
-            <div className="flex items-center space-x-2.5 group cursor-pointer select-none" onClick={handleScrollTop}>
-              {/* Logo Symbol */}
-              <div className="relative">
-                <div className="absolute inset-0 bg-brand-light-blue/20 rounded-lg blur-md group-hover:bg-brand-light-blue/40 transition-all duration-300"></div>
-                <div className="relative h-9 w-9 rounded-lg bg-slate-950 border border-brand-blue/30 flex flex-col items-center justify-center text-white shadow-lg overflow-hidden group-hover:border-brand-light-blue/50 transition-colors duration-300">
-                  <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-brand-light-blue/10 to-transparent"></div>
-                  <Terminal className="h-4 w-4 text-brand-light-blue group-hover:text-brand-accent transition-colors duration-300 z-10" />
-                  <div className="absolute bottom-0 inset-x-0 h-[2px] bg-gradient-to-r from-brand-blue via-brand-light-blue to-emerald-400"></div>
-                </div>
-              </div>
-              {/* Logo Text */}
-              <div className="flex flex-col">
-                <div className="flex items-center space-x-1 sm:space-x-1.5 leading-none">
-                  <span className="font-mono text-brand-light-blue/60 font-semibold text-[10px] tracking-tight">&lt;</span>
-                  <span className="font-sans font-black text-sm sm:text-base tracking-tight text-white group-hover:text-brand-light-blue transition-colors duration-200">
-                    Abegail<span className="text-brand-accent">.</span>Sayson
-                  </span>
-                  <span className="font-mono text-brand-light-blue/60 font-semibold text-[10px] tracking-tight">/&gt;</span>
-                </div>
-                <div className="flex items-center space-x-1 mt-0.5">
-                  <span className="h-1 w-1 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <p className="text-[7.5px] text-gray-400 font-mono tracking-widest uppercase font-bold">
-                    Automation Specialist
-                  </p>
-                </div>
-              </div>
-            </div>
-            
-            <p className="text-xs text-gray-400 leading-relaxed font-sans font-normal max-w-xs">
-              Systems engineer and workflow architect helping coaches, photographers, and service agencies eliminate repetitive operations.
+          {/* Brand info */}
+          <div className="md:col-span-5 space-y-4 text-center md:text-left">
+            <a href="#top" onClick={handleScrollTop} className="inline-block cursor-pointer select-none" aria-label="Abegail Sayson - Automation Services">
+              <img
+                src="/logo-horizontal-white.png"
+                alt="Abegail Sayson - Automation Services"
+                className="h-[40px] w-auto max-h-[40px] object-contain transition-opacity hover:opacity-90"
+                height={40}
+              />
+            </a>
+            <p className="text-sm text-gray-300 max-w-sm leading-relaxed font-sans">
+              AI Automation Specialist for Photographers &amp; Small Businesses. I build practical systems that handle leads, streamline bookings, and automate client follow-ups.
             </p>
-
-            <div className="flex space-x-3 pt-2">
-              <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="p-2 bg-white/5 hover:bg-brand-blue/30 text-gray-400 hover:text-white rounded-lg border border-white/5 hover:border-brand-blue/30 transition-all">
-                <Linkedin size={16} />
-              </a>
-              <a href="https://twitter.com" target="_blank" rel="noreferrer" className="p-2 bg-white/5 hover:bg-brand-blue/30 text-gray-400 hover:text-white rounded-lg border border-white/5 hover:border-brand-blue/30 transition-all">
-                <Twitter size={16} />
-              </a>
-              <a href="https://github.com" target="_blank" rel="noreferrer" className="p-2 bg-white/5 hover:bg-brand-blue/30 text-gray-400 hover:text-white rounded-lg border border-white/5 hover:border-brand-blue/30 transition-all">
-                <Github size={16} />
-              </a>
+            <div className="text-xs font-mono text-cyan-400">
+              Inquiry. Booked. Paid. Delivered.
             </div>
           </div>
 
-          {/* Column 2: Quick Links */}
-          <div className="space-y-4">
-            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-brand-light-blue">
-              Navigation Jumps
-            </h4>
-            <div className="grid grid-cols-1 gap-2.5">
-              {quickLinks.map((link) => (
-                <button
-                  key={link.id}
-                  onClick={() => onNavClick(link.id)}
-                  className="text-xs text-gray-400 hover:text-brand-light-blue text-left transition-colors duration-150 cursor-pointer"
+          {/* Quick Links */}
+          <div className="md:col-span-4 space-y-3 text-center md:text-left">
+            <span className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider block">
+              Navigation
+            </span>
+            <nav className="grid grid-cols-2 gap-2">
+              {navLinks.map((item, idx) => (
+                <a
+                  key={idx}
+                  href={item.path}
+                  onClick={(e) => handleLinkClick(item, e)}
+                  className="text-sm text-gray-300 hover:text-brand-accent transition-colors py-1 cursor-pointer"
                 >
-                  {link.label}
-                </button>
+                  {item.label}
+                </a>
               ))}
-            </div>
+            </nav>
           </div>
 
-          {/* Column 3: Contact details */}
-          <div className="space-y-4 md:col-span-2">
-            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-brand-light-blue">
-              Reach Out Directly
-            </h4>
-            <div className="space-y-3">
+          {/* Social Icons & Location */}
+          <div className="md:col-span-3 space-y-3 flex flex-col items-center md:items-start">
+            <span className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider block">
+              Connect
+            </span>
+            <div className="flex items-center space-x-3">
               <a
-                href={`mailto:${emailContact}`}
-                className="flex items-center space-x-2.5 text-xs text-gray-400 hover:text-brand-light-blue transition-colors group"
+                href="https://www.linkedin.com/in/abegail-s-797302202/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn"
+                className="p-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-accent/40 text-gray-300 hover:text-brand-accent transition-all cursor-pointer"
               >
-                <div className="p-1.5 rounded bg-white/5 border border-white/5 text-gray-400 group-hover:text-brand-light-blue shrink-0">
-                  <Mail size={13} />
-                </div>
-                <span>{emailContact}</span>
+                <Linkedin className="w-5 h-5" />
               </a>
-
-              <div className="text-xs text-gray-400 flex items-start space-x-2.5">
-                <div className="p-1.5 rounded bg-white/5 border border-white/5 text-gray-400 shrink-0">
-                  <Send size={13} />
-                </div>
-                <div>
-                  <p>Client Intake Hours: 09:00 AM - 05:00 PM (MNL)</p>
-                  <p className="text-[10px] text-gray-500 mt-1">Available for retainer contracts & custom n8n setups worldwide.</p>
-                </div>
-              </div>
+              <a
+                href="https://www.instagram.com/abegailsaysontechva/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="p-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-accent/40 text-gray-300 hover:text-brand-accent transition-all cursor-pointer"
+              >
+                <Instagram className="w-5 h-5" />
+              </a>
             </div>
+            <p className="text-xs text-slate-400 pt-1">
+              Direct inquiries: <a href="mailto:abegailsaysontechva@gmail.com" className="text-cyan-400 hover:underline">abegailsaysontechva@gmail.com</a>
+            </p>
           </div>
 
         </div>
 
-        {/* Foot border panel */}
-        <div className="pt-8 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-gray-500 font-mono">
-          <p>© {currentYear} Abegail S. All rights reserved. Built with modern React & Tailwind.</p>
-          
-          <button
-            onClick={handleScrollTop}
-            className="flex items-center space-x-1 hover:text-white transition-colors py-1 px-2 rounded hover:bg-white/5 cursor-pointer"
-          >
-            <span>Back to Top</span>
-            <ArrowUp size={12} className="animate-bounce" />
-          </button>
+        {/* Bottom line */}
+        <div className="pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+          <p className="text-xs text-gray-400 font-sans tracking-wide">
+            © 2026 Abegail Sayson Tech · Based in the Philippines, working with photographers worldwide.
+          </p>
+          <div className="text-[11px] font-mono text-slate-500">
+            AI Automation Specialist for Photographers &amp; Small Businesses
+          </div>
         </div>
 
       </div>

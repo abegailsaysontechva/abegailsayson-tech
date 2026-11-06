@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 36" height="36" fill="none">
+  <!-- Brand mark: Aperture / Studio Monogram -->
+  <g transform="translate(0, 2)">
+    <rect x="2" y="2" width="28" height="28" rx="8" fill="#1E293B" stroke="#334155" stroke-width="1.5"/>
+    <!-- Camera/Aperture subtle icon -->
+    <circle cx="16" cy="16" r="6" stroke="#F97316" stroke-width="2" fill="none"/>
+    <circle cx="16" cy="16" r="2.5" fill="#F97316"/>
+    <path d="M12 7L14 5H18L20 7" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="23" cy="10" r="1" fill="#F97316"/>
+  </g>
+  <!-- Brand Wordmark -->
+  <text x="40" y="22" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="800" fill="#FFFFFF" letter-spacing="-0.02em">Abegail Sayson</text>
+  <circle cx="218" cy="19" r="3" fill="#F97316"/>
+  <!-- Subtitle -->
+  <text x="40" y="32" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="7.5" font-weight="700" fill="#94A3B8" letter-spacing="0.18em">STUDIO AUTOMATION</text>
+</svg>

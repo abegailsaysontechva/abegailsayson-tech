@@ -1,79 +1,77 @@
 import React, { useState } from 'react';
-import { SERVICES } from '../data';
 import { 
-  Cpu, 
-  Database, 
-  Sparkles, 
-  FileCheck, 
-  CheckCircle2, 
-  ArrowRight, 
+  Globe, 
   Zap, 
-  Bot, 
-  Timer,
-  ChevronRight,
-  MessageSquare
+  CalendarCheck, 
+  Camera, 
+  CheckCircle2, 
+  ChevronDown, 
+  ChevronUp, 
+  ArrowRight,
+  Workflow
 } from 'lucide-react';
 
-const SERVICE_HEADERS = [
+interface ServiceItem {
+  id: string;
+  title: string;
+  outcome: string;
+  icon: React.ReactNode;
+  bullets: string[];
+  howItWorks: string;
+}
+
+const SERVICES_DATA: ServiceItem[] = [
   {
-    id: 1,
-    style: "Professional Consultant (Systems-Leveled)",
-    title: "Strategic Systems to Leverage Your Time",
-    subtitle: "Custom CRM architectures and refined handoffs that increase your billable capacity while operating flawlessly behind the scenes."
+    id: 'booking-funnel-website',
+    title: 'Booking Funnel Website',
+    outcome: 'Visitors become inquiries.',
+    icon: <Globe className="h-6 w-6 text-brand-accent" />,
+    bullets: [
+      'One-page or multi-page photography website',
+      'Clear packages, portfolio, and inquiry form',
+      'Mobile-first, fast-loading, SEO basics',
+      'Built to lead to one action: booking a consultation'
+    ],
+    howItWorks: 'Visitor lands on your page → sees your work and packages → submits inquiry → the system takes over.'
   },
   {
-    id: 2,
-    style: "Professional Consultant (Frictionless Ops)",
-    title: "Frictionless Operations Designed for Your Business",
-    subtitle: "Stop letting administrative bottlenecks slow your growth. I architect bespoke, high-efficiency system structures that let you lead in your zone of genius."
+    id: 'inquiry-followup-automation',
+    title: 'Inquiry & Follow-Up Automation',
+    outcome: 'No inquiry goes unanswered.',
+    icon: <Zap className="h-6 w-6 text-brand-accent" />,
+    bullets: [
+      'Instant auto-reply with your pricing guide',
+      'Inquiry tracking in Notion or a CRM',
+      'Automatic follow-up if the client goes quiet',
+      'Notifications to you on Slack, email, or WhatsApp'
+    ],
+    howItWorks: 'New form submission → saved to your CRM → personalized reply sent → follow-ups scheduled.'
   },
   {
-    id: 3,
-    style: "Premium Agency (High-Precision)",
-    title: "Uncompromising Operational Infrastructure for Leaders",
-    subtitle: "Elite businesses don't scale through manual effort; they scale through impeccable design. We build high-fidelity workflows that capture and retain client value 24/7."
+    id: 'booking-contracts-payments',
+    title: 'Booking, Contracts & Payments',
+    outcome: 'Clients book and pay without back-and-forth.',
+    icon: <CalendarCheck className="h-6 w-6 text-brand-accent" />,
+    bullets: [
+      'Online consultation and session booking',
+      'Contract and deposit invoice sent automatically',
+      'Client questionnaire before the session',
+      'Reminders to reduce no-shows'
+    ],
+    howItWorks: 'Client picks a date → contract and deposit link sent → questionnaire and reminders follow.'
   },
   {
-    id: 4,
-    style: "Premium Agency (Brand Suite)",
-    title: "The Ultimate Standard in Workflow Architecture",
-    subtitle: "Elevate your brand experience with flawlessly synchronized pipelines. Seamless processes that turn first impressions into lifelong clients."
-  },
-  {
-    id: 5,
-    style: "Results-Driven (Core Conversion)",
-    title: "Eliminate Repetitive Tasks, Multiply Your Growth",
-    subtitle: "Automate your lead-scoring, intake processing, and onboarding loops to immediately recapture lost hours and boost conversion margins."
-  },
-  {
-    id: 6,
-    style: "Results-Driven (Premium Efficiency)",
-    title: "Buy Back Your Hours with High-Impact Automation",
-    subtitle: "Double your delivery speed without doubling your staff. Discover streamlined workflows that handle lead routing and operational checkpoints autonomously."
-  },
-  {
-    id: 7,
-    style: "Modern Tech (AI-Native Ecosystem)",
-    title: "Powering Your Workflows with Autonomous Intelligence",
-    subtitle: "Deploy custom API integrations, smart CRM models, and Gemini-based agents to handle manual triage and scale up your daily throughput."
-  },
-  {
-    id: 8,
-    style: "Modern Tech (Unification Architecture)",
-    title: "Next-Generation Pipelines Built to Automate Scale",
-    subtitle: "Link your entire tech stack into a single, high-performance ecosystem. Zero manual handoffs, real-time syncs, and bulletproof API relays."
-  },
-  {
-    id: 9,
-    style: "Friendly & Approachable (Admin Saver)",
-    title: "Automated Systems Built for Real Humans",
-    subtitle: "You shouldn't need a software engineering degree to run a smooth business. I create simple, friendly tools that take care of admin work so you don't have to."
-  },
-  {
-    id: 10,
-    style: "Friendly & Approachable (Requested Growth Copy)",
-    title: "Transform Your Business with Smart Automation",
-    subtitle: "From lead capture to client onboarding, I design automated systems that eliminate repetitive tasks, streamline operations, and help your business grow without adding more work to your plate."
+    id: 'gallery-delivery-reviews-rebooking',
+    title: 'Gallery Delivery, Reviews & Rebooking',
+    outcome: 'Happy clients become reviews and repeat bookings.',
+    icon: <Camera className="h-6 w-6 text-brand-accent" />,
+    bullets: [
+      'Gallery delivery email with a clear next step',
+      'Review request after delivery',
+      'Referral and anniversary or seasonal rebooking emails',
+      'Organized client folders and a simple client portal'
+    ],
+    howItWorks: 'Gallery delivered → thank-you sent → review requested → rebooking reminder scheduled.'
   }
 ];
 
@@ -82,154 +80,130 @@ interface ServicesProps {
 }
 
 export const Services: React.FC<ServicesProps> = ({ onServiceSelect }) => {
-  const [selectedStyleIdx, setSelectedStyleIdx] = useState<number>(9); // Defaults to Option 10 as requested
-  const [activeRecipeId, setActiveRecipeId] = useState<string | null>('workflow');
+  const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({
+    'booking-funnel-website': true // Expand first one for preview, others collapsed
+  });
 
-  // Map icon string to Lucide component
-  const getIcon = (iconName: string) => {
-    switch (iconName) {
-      case 'Cpu':
-        return <Cpu className="h-6 w-6 text-brand-accent" />;
-      case 'Database':
-        return <Database className="h-6 w-6 text-brand-accent" />;
-      case 'FileCheck':
-        return <FileCheck className="h-6 w-6 text-brand-accent" />;
-      case 'BsChatDots':
-      default:
-        return <Sparkles className="h-6 w-6 text-brand-accent" />;
+  const toggleCard = (id: string) => {
+    setExpandedCards(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
+  const scrollToBooking = (serviceId?: string) => {
+    if (serviceId && onServiceSelect) {
+      onServiceSelect(serviceId);
+    }
+    const contactSec = document.getElementById('contact');
+    if (contactSec) {
+      contactSec.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
-  const currentHeaderCopy = SERVICE_HEADERS[selectedStyleIdx];
-
   return (
-    <section id="services" className="py-24 bg-transparent text-white border-b border-white/5 relative">
-      {/* Ambience glow indicators */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-accent/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
-
+    <section id="services" className="py-24 bg-transparent text-white relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
         {/* Section Header */}
-        <div className="text-center space-y-4 mb-20 transition-all duration-300">
-          <div className="inline-flex items-center space-x-2 bg-brand-accent/20 border border-brand-accent/30 rounded-full px-3 py-1">
-            <Zap className="h-4 w-4 text-brand-accent" />
+        <div className="text-center space-y-4 mb-16 sm:mb-20">
+          <div className="inline-flex items-center space-x-2 bg-brand-accent/20 border border-brand-accent/30 rounded-full px-3.5 py-1">
+            <Zap className="h-3.5 w-3.5 text-brand-accent" />
             <span className="text-xs font-mono font-bold text-brand-accent uppercase tracking-wider">
-              Core Capabilities
+              WHAT I BUILD
             </span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white font-sans max-w-4xl mx-auto leading-tight transition-all">
-            {currentHeaderCopy.title}
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white font-sans max-w-4xl mx-auto leading-tight">
+            A Complete Booking System for Your Photography Business
           </h2>
-          <p className="text-base sm:text-lg text-gray-400 max-w-3xl mx-auto leading-relaxed transition-all">
-            {currentHeaderCopy.subtitle}
+          <p className="text-base sm:text-lg text-slate-300 max-w-3xl mx-auto leading-relaxed">
+            From the first inquiry to the final gallery, every step runs automatically, and your website is built to bring those inquiries in.
           </p>
         </div>
 
-        {/* Services Showcase Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
-          {SERVICES.map((service) => {
-            const hasActiveRecipe = activeRecipeId === service.id;
+        {/* 2x2 Services Grid (single column on mobile) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+          {SERVICES_DATA.map((service) => {
+            const isExpanded = !!expandedCards[service.id];
+
             return (
               <div 
                 id={`service-card-${service.id}`}
                 key={service.id}
-                className="group relative rounded-3xl bg-slate-900/30 border border-white/5 hover:border-brand-accent/30 p-8 hover:bg-slate-900/50 transition-all duration-300 flex flex-col justify-between shadow-lg"
+                className="group relative rounded-3xl card-glass hover:border-brand-accent/40 p-6 sm:p-8 transition-all duration-300 flex flex-col justify-between shadow-xl"
               >
                 <div className="space-y-6">
-                  {/* Card Header row */}
-                  <div className="flex items-start justify-between">
+                  {/* Card Header */}
+                  <div className="flex items-center justify-between">
                     <div className="p-3 bg-brand-accent/10 border border-brand-accent/20 rounded-2xl group-hover:bg-brand-accent/20 transition-colors">
-                      {getIcon(service.icon)}
+                      {service.icon}
                     </div>
+                    <span className="text-xs font-mono font-semibold text-slate-400 bg-white/5 px-2.5 py-1 rounded-full border border-white/5">
+                      Photography System
+                    </span>
                   </div>
 
                   <div>
                     <h3 className="text-2xl font-bold text-white group-hover:text-brand-accent transition-colors font-sans">
                       {service.title}
                     </h3>
-                    <p className="mt-3 text-gray-400 text-sm leading-relaxed font-sans">
-                      {service.description}
+                    <p className="mt-2 text-brand-accent font-medium text-sm font-sans flex items-center gap-1.5">
+                      <span>•</span> {service.outcome}
                     </p>
                   </div>
 
-                  {/* Bullet points benefits */}
-                  <ul className="space-y-3 pt-2">
+                  {/* Bullet points */}
+                  <ul className="space-y-3 pt-1">
                     {service.bullets.map((bullet, index) => (
-                      <li key={index} className="flex items-start text-sm text-gray-300 font-sans">
+                      <li key={index} className="flex items-start text-sm text-slate-300 font-sans leading-relaxed">
                         <CheckCircle2 className="h-4.5 w-4.5 text-brand-accent shrink-0 mr-3 mt-0.5" />
                         <span>{bullet}</span>
                       </li>
                     ))}
                   </ul>
 
-                  {/* Operational Recipe Accordion */}
-                  {service.exampleWorkflow && (
-                    <div className="mt-6 border-t border-white/5 pt-5">
-                      <button
-                        onClick={() => setActiveRecipeId(hasActiveRecipe ? null : service.id)}
-                        className="flex items-center justify-between w-full text-xs font-mono font-semibold text-brand-accent/90 hover:text-brand-accent cursor-pointer tracking-wider uppercase transition-colors"
-                      >
-                        <span>{hasActiveRecipe ? 'Hide Code Recipe' : 'View Core Automation Recipe'}</span>
-                        <ChevronRight className={`h-4 w-4 transform transition-transform duration-200 ${hasActiveRecipe ? 'rotate-90 text-brand-accent' : 'text-gray-500'}`} />
-                      </button>
-
-                      {hasActiveRecipe && (
-                        <div className="mt-4 rounded-2xl bg-slate-950/60 border border-white/5 p-5 space-y-4 animate-fadeIn">
-                          {/* Trigger point */}
-                          <div>
-                            <span className="text-[10px] uppercase tracking-wider font-mono text-gray-500 block">Trigger Condition</span>
-                            <div className="mt-1 flex items-center space-x-2">
-                              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping shrink-0" />
-                              <span className="text-xs font-mono text-emerald-400 bg-emerald-950/40 px-2.5 py-1 rounded border border-emerald-900/30">
-                                {service.exampleWorkflow.trigger}
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Connection path lines */}
-                          <div>
-                            <span className="text-[10px] uppercase tracking-wider font-mono text-gray-500 block mb-2">Automated Execution Pipeline</span>
-                            <div className="space-y-2 relative pl-3 before:absolute before:left-1 before:top-2 before:bottom-2 before:w-[1px] before:bg-brand-accent/20">
-                              {service.exampleWorkflow.steps.map((step, idx) => (
-                                <div key={idx} className="flex items-center text-xs text-gray-300 font-mono space-x-2">
-                                  <span className="w-2 h-2 rounded-full bg-brand-accent shrink-0" />
-                                  <span className="text-gray-400">{step}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-
-                          {/* Concrete outcome */}
-                          <div className="pt-2 border-t border-white/5">
-                            <span className="text-[10px] uppercase tracking-wider font-mono text-gray-100 block">Immediate Concrete Outcome</span>
-                            <p className="mt-1 text-sm font-sans font-medium text-white flex items-center gap-1.5">
-                              <Timer className="h-4 w-4 text-brand-accent" />
-                              {service.exampleWorkflow.result}
-                            </p>
-                          </div>
-                        </div>
+                  {/* Expandable "How it works" line */}
+                  <div className="pt-2 border-t border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => toggleCard(service.id)}
+                      className="flex items-center justify-between w-full text-xs font-mono font-bold text-slate-200 hover:text-brand-accent cursor-pointer tracking-wider uppercase transition-colors py-2"
+                      aria-expanded={isExpanded}
+                    >
+                      <span className="flex items-center gap-2">
+                        <Workflow className="h-3.5 w-3.5 text-brand-accent" />
+                        How it works
+                      </span>
+                      {isExpanded ? (
+                        <span className="flex items-center gap-1 text-brand-accent text-xs">
+                          Hide <ChevronUp className="h-4 w-4" />
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1 text-slate-400 group-hover:text-slate-200 text-xs">
+                          Expand <ChevronDown className="h-4 w-4" />
+                        </span>
                       )}
-                    </div>
-                  )}
+                    </button>
+
+                    {isExpanded && (
+                      <div className="mt-2 rounded-xl bg-slate-950/70 border border-white/10 p-4 animate-fadeIn">
+                        <p className="text-xs sm:text-sm text-slate-200 font-sans leading-relaxed">
+                          {service.howItWorks}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="mt-8 pt-6 border-t border-white/5">
+                {/* Bottom Card Action */}
+                <div className="mt-8 pt-5 border-t border-white/10 flex items-center justify-between">
                   <button
-                    onClick={() => {
-                      if (onServiceSelect) {
-                        onServiceSelect(service.id);
-                      } else {
-                        const contactSec = document.getElementById('contact');
-                        if (contactSec) {
-                          contactSec.scrollIntoView({ behavior: 'smooth' });
-                        }
-                      }
-                    }}
+                    type="button"
+                    onClick={() => scrollToBooking(service.id)}
                     className="inline-flex items-center text-xs font-mono font-bold text-brand-accent hover:text-white uppercase tracking-wider cursor-pointer group/btn"
                   >
-                    <span>Streamline This Process</span>
-                    <ArrowRight className="ml-2 h-3 w-3 transform group-hover/btn:translate-x-1.5 transition-transform" />
+                    <span>Get this for your studio</span>
+                    <ArrowRight className="ml-2 h-3.5 w-3.5 transform group-hover/btn:translate-x-1.5 transition-transform" />
                   </button>
                 </div>
               </div>
@@ -237,22 +211,20 @@ export const Services: React.FC<ServicesProps> = ({ onServiceSelect }) => {
           })}
         </div>
 
-        {/* Section Footer Callout */}
-        <div className="mt-16 text-center max-w-xl mx-auto p-8 rounded-3xl bg-slate-900/20 border border-white/5 font-sans">
-          <h4 className="text-lg font-bold text-white mb-2">Not seeing your exact system requirements?</h4>
-          <p className="text-sm text-gray-400 leading-relaxed mb-6">
-            I customize pipelines to fit your proprietary business operations and legacy platforms. Let’s map your workflow needs.
+        {/* Bottom Callout block */}
+        <div className="mt-8 text-center max-w-2xl mx-auto p-8 sm:p-10 rounded-3xl bg-slate-900/40 border border-white/10 shadow-xl font-sans">
+          <h3 className="text-2xl sm:text-3xl font-extrabold text-white mb-3">
+            Not sure where to start?
+          </h3>
+          <p className="text-sm sm:text-base text-slate-300 leading-relaxed mb-6 max-w-xl mx-auto">
+            Book a free audit. I'll review your current website and workflow and show you the three quick wins that will get you more bookings.
           </p>
           <button
-            onClick={() => {
-              const contactSec = document.getElementById('contact');
-              if (contactSec) {
-                contactSec.scrollIntoView({ behavior: 'smooth' });
-              }
-            }}
-            className="px-6 py-3 rounded-full bg-brand-accent hover:bg-brand-accent/80 text-white font-semibold cursor-pointer transition-all shadow-lg hover:shadow-brand-accent/20 text-sm"
+            type="button"
+            onClick={() => scrollToBooking()}
+            className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 rounded-full bg-brand-accent hover:bg-brand-accent/90 text-white font-bold cursor-pointer transition-all shadow-lg hover:shadow-brand-accent/25 text-sm uppercase font-mono tracking-wider"
           >
-            Book Free Audit Consult
+            Get a Free Studio Funnel Audit
           </button>
         </div>
 
